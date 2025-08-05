@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
   Alert
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons } from "@expo/vector-icons"; // The eye icon
 import { router } from "expo-router";
 
 const { height, width } = Dimensions.get("window");
@@ -68,13 +68,13 @@ export default function LoginScreen() {
                 style={[
                   style.input,
                   focusedInput === "email" && style.inputFocused,
-                ]}
+                ]} // If the currently focused input is "email", apply the inputFocused style.
                 placeholder="Email"
                 placeholderTextColor="#626262"
                 value={email}
                 onChangeText={setEmail}
                 onFocus={() => setFocusedInput("email")}
-                onBlur={() => setFocusedInput("")}
+                onBlur={() => setFocusedInput("")} // When the user leaves (or unfocuses) the input field, remove the focus style
               />
             </View>
 
@@ -91,7 +91,7 @@ export default function LoginScreen() {
                         onChangeText={setPassword}
                         onFocus={() => setFocusedInput("password")}
                         onBlur={() => setFocusedInput("")}
-                        secureTextEntry={!showPassword}
+                        secureTextEntry={!showPassword} // Only hide the text if showPassword is false
                     />
 
                     <TouchableOpacity style={style.eyeIcon} onPress={toggleShowPassword}>
@@ -133,7 +133,7 @@ const style = StyleSheet.create({
     height: height * 0.4,
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: width * 0.05,
+    paddingHorizontal: width * 0.05, // Sets left and right padding of a component (equally)
   },
   mainText: {
     fontSize: width * 0.08,
@@ -192,13 +192,13 @@ const style = StyleSheet.create({
     alignItems: "center",
     marginBottom: height * 0.04,
     shadowColor: "#1F41BB",
-    shadowOffset: {
+    shadowOffset: {     // Controls how far the shadow is offset from the component
         width: 0,
         height: height * 0.005
     },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.3, // Controls how transparent the shadow is
     shadowRadius: width * 0.02,
-    elevation: 8,
+    elevation: 8,       // How strong the shadow is
     borderRadius: width * 0.025
   },
   loginText: {

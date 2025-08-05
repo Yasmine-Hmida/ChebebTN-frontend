@@ -5,9 +5,11 @@ export default function RootLayout() {
   return ( 
       <>
         <StatusBar style="auto"/>
+
+        {/* Stack : The navigation system for your app */}
         <Stack
           screenOptions={{
-            animation: "slide_from_right",
+            animation: "slide_from_right", // makes screens slide in from the right 
           }}
         >
           <Stack.Screen name="index" options={{ headerShown: false }} />
