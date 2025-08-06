@@ -140,7 +140,12 @@ export default function Home() {
     setModalVisible(false);
     switch(action){
         case "edit":
-            router.push("/(screens)/Edit");
+            router.push({
+              pathname: "/(screens)/Edit",
+              params: {
+                selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
+              },
+            });
             break;
         case "delete":
             Alert.alert("Delete" , `Are you sure you want to delete the Job: ${selectedJob?.title} ?`,
@@ -151,7 +156,12 @@ export default function Home() {
             );
             break;
         case "view":
-            router.push("/(screens)/ViewPage");
+            router.push({
+              pathname: "/(screens)/ViewPage",
+              params: {
+                selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
+              },
+            });
             break;
     }
   }
