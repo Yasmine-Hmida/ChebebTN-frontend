@@ -50,6 +50,7 @@ export default function LoginScreen() {
 
     if(username === "test" && email === "test@chebebtn.com" && password === "123456"){
         Alert.alert('Success', 'Successful Register!')
+        router.replace("/(auth)/Login")
     }
     else{
         Alert.alert('Error', 'Invalid contact details!')
@@ -62,7 +63,7 @@ export default function LoginScreen() {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="#1F41BB"/>
+      <StatusBar barStyle="dark-content"/>
       <View style={style.container}>
 
         <View style={style.headerSection}>

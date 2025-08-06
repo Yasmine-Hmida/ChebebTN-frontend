@@ -5,7 +5,7 @@ import { StyleSheet, View, ActivityIndicator, Text } from "react-native";
 export default function Index() {
   useEffect(() => {
     const timer = setTimeout(() => {
-      router.replace("/(auth)/Login");
+      router.replace("/(screens)/Home");
     }, 1000); // Wait 1s to avoid system crashes
 
     return () => clearTimeout(timer); // Cleanup function

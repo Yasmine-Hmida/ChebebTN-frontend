@@ -38,6 +38,7 @@ export default function LoginScreen() {
 
     if(email === "test@chebebtn.com" && password === "123456"){
         Alert.alert('Success', 'Successful Login!')
+        router.replace("/(screens)/Home")
     }
     else{
         Alert.alert('Error', 'Invalid Email or Password!')
@@ -50,7 +51,7 @@ export default function LoginScreen() {
 
   return (
     <>
-      <StatusBar barStyle="dark-content" backgroundColor="#1F41BB"/>
+      <StatusBar barStyle="dark-content"/>
       <View style={style.container}>
 
         <View style={style.headerSection}>

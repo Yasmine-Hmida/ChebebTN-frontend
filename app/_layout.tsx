@@ -10,11 +10,14 @@ export default function RootLayout() {
         <Stack
           screenOptions={{
             animation: "slide_from_right", // makes screens slide in from the right 
+            headerShown: false 
           }}
         >
-          <Stack.Screen name="index" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)/Login" options={{ headerShown: false }} />
-          <Stack.Screen name="(auth)/Register" options={{ headerShown: false }} />
+          <Stack.Screen name="index" />
+          <Stack.Screen name="(auth)/Login" />
+          <Stack.Screen name="(auth)/Register" />
+          <Stack.Screen name="(screens)/Home" />
+          <Stack.Screen name="(screens)/Add" />
         </Stack>
       </>
   );
