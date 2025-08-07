@@ -12,6 +12,9 @@ import {
 import { Ionicons } from "@expo/vector-icons"; // The eye icon
 import { router } from "expo-router";
 
+import AsyncStorage from '@react-native-async-storage/async-storage' // equivalent à localstorage (store the token)
+import axios from "axios" // fetch (more secure)
+
 const { height, width } = Dimensions.get("window");
 
 export default function LoginScreen() {
@@ -24,7 +27,7 @@ export default function LoginScreen() {
     setShowPassword(!showPassword);
   }
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if(!email || !password){
         Alert.alert('Error', 'Please fill all fields!')
         return;
@@ -36,12 +39,33 @@ export default function LoginScreen() {
         return;
     }
 
-    if(email === "test@chebebtn.com" && password === "123456"){
-        Alert.alert('Success', 'Successful Login!')
-        router.replace("/(screens)/Home")
+    try{
+      // Appel API  avec AXIOS and 10.0.2.2 : mobile 3al android studio wa ela esta3mel el URL manuel
+      const response = await axios.post("http://10.0.2.2:3000/api/login" , {
+        email,
+        password
+      });
+
+      // verify response
+      if(response.data.status === "Success"){
+        const {token , userId , role} = response.data.result; // take token .. result from postman
+        console.log("Token", token)
+
+        // save in async stroage
+        await AsyncStorage.setItem("token" , token);
+        await AsyncStorage.setItem("userId" , userId);
+        await AsyncStorage.setItem("role" , role);
+
+        Alert.alert("Success" , "Login done Successfully , welcome to chebebTN !!");
+        router.push("/(screens)/Home");
+      }
+      else{
+        Alert.alert("Error", "Email or password incorrect!")
+      }
     }
-    else{
-        Alert.alert('Error', 'Invalid Email or Password!')
+    catch(err){
+      console.log("Login Error: ", err);
+      Alert.alert("Error" , "Connexion Error!!")
     }
   }
 

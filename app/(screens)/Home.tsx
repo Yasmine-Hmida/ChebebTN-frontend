@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Ionicons } from "@expo/vector-icons";
 import {
   View,
@@ -12,12 +12,14 @@ import {
   Alert,
 } from "react-native";
 import { router } from "expo-router";
+import axios from "axios";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height, width } = Dimensions.get("window");
 
 // Fake Schema
 interface Job {
-  id: number;
+  _id: string;
   title: string;
   company: string;
   description: string;
@@ -28,101 +30,43 @@ interface Job {
   experienceLevel: string;
   skills: string[];
   applicationDeadline: string;
-  postedBy: string;
+  postedBy?: string; // Option ken fama wa7det fer8in
   createdAt: string;
   updatedAt: string;
+  applications: { userId: string; appliedAt: string; _id: string }[];
 }
 
 export default function Home() {
   const [searchText, setSearchText] = useState("");
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [jobs, setJobs] = useState<Job[]>([]);
 
-  // Modal
-  const [selectedJob , setSelectedJob] = useState<Job | null >(null);
-  const [modalVisible , setModalVisible] = useState(false);
+  // Get jobs from DB
+  const fetchJobs = async () => {
+    try {
+      const response = await axios.get("http://10.0.2.2:3000/api/jobs");
+      setJobs(response.data);
+    } catch (err) {
+      console.log("Error", err);
+      Alert.alert("Error", "Error in getting jobs from database!");
+    }
+  };
 
-  // Fake Jobs   
-  const [jobs] = useState<Job[]>([
-    {
-      id: 1,
-      title: "Software Engineer",
-      company: "Tech Corp",
-      description: "Build web apps",
-      salary: 60000,
-      location: "Remote",
-      jobType: "Full-time",
-      status: "Open",
-      experienceLevel: "Mid",
-      skills: ["JavaScript", "Node.js"],
-      applicationDeadline: "2025-12-31T00:00:00.000Z",
-      postedBy: "688a7d321be8063255af6d0f",
-      createdAt: "2025-07-31T09:37:27.495Z",
-      updatedAt: "2025-07-31T09:37:27.495Z",
-    },
-    {
-      id: 2,
-      title: "UI/UX Designer",
-      company: "Design Studio",
-      description: "Create beautiful user interfaces",
-      salary: 55000,
-      location: "New York",
-      jobType: "Full-time",
-      status: "Open",
-      experienceLevel: "Senior",
-      skills: ["Figma", "Adobe XD", "Sketch"],
-      applicationDeadline: "2025-11-30T00:00:00.000Z",
-      postedBy: "688a7d321be8063255af6d10",
-      createdAt: "2025-07-30T09:37:27.495Z",
-      updatedAt: "2025-07-30T09:37:27.495Z",
-    },
-    {
-      id: 3,
-      title: "Data Scientist",
-      company: "Analytics Inc",
-      description: "Analyze complex data sets",
-      salary: 75000,
-      location: "San Francisco",
-      jobType: "Full-time",
-      status: "Open",
-      experienceLevel: "Senior",
-      skills: ["Python", "Machine Learning", "SQL"],
-      applicationDeadline: "2025-10-15T00:00:00.000Z",
-      postedBy: "688a7d321be8063255af6d11",
-      createdAt: "2025-07-29T09:37:27.495Z",
-      updatedAt: "2025-07-29T09:37:27.495Z",
-    },
-    {
-      id: 4,
-      title: "Mobile Developer",
-      company: "Mobile Solutions",
-      description: "Develop mobile applications",
-      salary: 65000,
-      location: "Austin",
-      jobType: "Part-time",
-      status: "Open",
-      experienceLevel: "Mid",
-      skills: ["React Native", "Flutter", "Swift"],
-      applicationDeadline: "2025-09-30T00:00:00.000Z",
-      postedBy: "688a7d321be8063255af6d12",
-      createdAt: "2025-07-28T09:37:27.495Z",
-      updatedAt: "2025-07-28T09:37:27.495Z",
-    },
-    {
-      id: 5,
-      title: "DevOps Engineer",
-      company: "Cloud Systems",
-      description: "Manage cloud infrastructure",
-      salary: 70000,
-      location: "Seattle",
-      jobType: "Full-time",
-      status: "Open",
-      experienceLevel: "Senior",
-      skills: ["AWS", "Docker", "Kubernetes"],
-      applicationDeadline: "2025-08-31T00:00:00.000Z",
-      postedBy: "688a7d321be8063255af6d13",
-      createdAt: "2025-07-27T09:37:27.495Z",
-      updatedAt: "2025-07-27T09:37:27.495Z",
-    },
-  ]);
+  // Fetch data from backend and user role from asyncstorage
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        const role = await AsyncStorage.getItem("role");
+        setIsAdmin(role === "Admin");
+      } catch (err) {
+        console.log("Error in fetching jobs", err);
+      }
+    };
+    fetchJobs();
+    checkUserRole();
+  }, []);
 
   // Format the salary
   const formatSalary = (salary: number): string => {
@@ -135,50 +79,66 @@ export default function Home() {
     return date.toLocaleDateString(); // 2025-07-27T09:37:27.495Z => 31/08/2025
   };
 
-  // Handle Action   
-  const handleAction = (action:string) => {
+  // Handle Action
+  const handleAction = (action: string) => {
     setModalVisible(false);
-    switch(action){
-        case "edit":
-            router.push({
-              pathname: "/(screens)/Edit",
-              params: {
-                selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
-              },
-            });
-            break;
-        case "delete":
-            Alert.alert("Delete" , `Are you sure you want to delete the Job: ${selectedJob?.title} ?`,
-                [
-                    {text: "Cancel" , style: "cancel"},
-                    {text: "Delete" , style: "destructive"},
-                ]
-            );
-            break;
-        case "view":
-            router.push({
-              pathname: "/(screens)/ViewPage",
-              params: {
-                selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
-              },
-            });
-            break;
+    switch (action) {
+      case "edit":
+        router.push({
+          pathname: "/(screens)/Edit",
+          params: {
+            selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
+          },
+        });
+        break;
+      case "delete":
+        Alert.alert(
+          "Delete",
+          `Are you sure you want to delete the Job: ${selectedJob?.title} ?`,
+          [
+            { text: "Cancel", style: "cancel" },
+            { text: "Delete", style: "destructive" },
+          ]
+        );
+        break;
+      case "view":
+        router.push({
+          pathname: "/(screens)/ViewPage",
+          params: {
+            selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
+          },
+        });
+        break;
+    }
+  };
+
+  // Handle Logout
+  const handleLogout = () => {
+    try{
+      AsyncStorage.clear()
+      router.push("/(auth)/Login")
+    }
+    catch(err){
+      console.error("Error clearing AsyncStorage" , err);
+      Alert.alert("Error" , "Error in loging out")
     }
   }
 
   // JobCard Component
   const JobCard: React.FC<{ item: Job }> = ({ item }) => (
     <View style={style.jobCard}>
-
       <View style={style.cardHeader}>
         <View style={style.jobInfo}>
           <Text style={style.jobTitle}>{item.title}</Text>
           <Text style={style.company}>{item.company}</Text>
         </View>
-        <TouchableOpacity style={style.menuButton} onPress={() => {
+        <TouchableOpacity
+          style={style.menuButton}
+          onPress={() => {
             setSelectedJob(item);
             setModalVisible(true);
-        }}>
+          }}
+        >
           <Ionicons name="ellipsis-vertical" size={20} color="#666" />
         </TouchableOpacity>
       </View>
@@ -203,18 +163,19 @@ export default function Home() {
       </View>
 
       <View style={style.skillsContainer}>
-        {item.skills.slice(0,3).map((skill , index) => (
-            <View key={index} style={style.skillTag}>
-                <Text style={style.skillText}>{skill}</Text>
-            </View>
+        {item.skills.slice(0, 3).map((skill, index) => (
+          <View key={index} style={style.skillTag}>
+            <Text style={style.skillText}>{skill}</Text>
+          </View>
         ))}
       </View>
 
       <View style={style.cardFooter}>
         <Text style={style.experienceLevel}>{item.experienceLevel}</Text>
-        <Text style={style.deadline}>Deadline: {formatDate(item.applicationDeadline)}</Text>
+        <Text style={style.deadline}>
+          Deadline: {formatDate(item.applicationDeadline)}
+        </Text>
       </View>
-
     </View>
   );
 
@@ -224,6 +185,12 @@ export default function Home() {
         {/* Header */}
         <View style={style.header}>
           <Text style={style.headerTitle}>Jobs Available</Text>
+          <TouchableOpacity
+            style={style.logoutButton}
+            onPress={handleLogout}
+          >
+            <Ionicons name="log-out-outline" size={24} color="white"/>
+          </TouchableOpacity>
         </View>
 
         {/* Search Bar */}
@@ -246,62 +213,72 @@ export default function Home() {
         </View>
 
         {/* Add Job */}
-        <TouchableOpacity style={style.addButton} onPress={() => router.push("/(screens)/Add")}>
-          <Ionicons name="add" size={24} color="white" />
-          <Text style={style.addButtonText}>Add a job</Text>
-        </TouchableOpacity>
+        {isAdmin ? (
+          <TouchableOpacity
+            style={style.addButton}
+            onPress={() => router.push("/(screens)/Add")}
+          >
+            <Ionicons name="add" size={24} color="white" />
+            <Text style={style.addButtonText}>Add a job</Text>
+          </TouchableOpacity>
+        ) : (
+          <></>
+        )}
 
         {/* List of jobs */}
         <FlatList
           data={jobs}
-          keyExtractor={(item) => item.id.toString()}
+          keyExtractor={(item) => item._id.toString()}
           renderItem={({ item }) => <JobCard item={item} />} // How to display each item
           contentContainerStyle={style.listContainer} // Style the content
           showsVerticalScrollIndicator={false} // Hide the scrollBar
         />
 
         {/* Modal */}
-        <Modal 
-            visible={modalVisible}
-            transparent={true}
-            animationType="fade"
-            onRequestClose={() => setModalVisible(false)} // Close the modal
+        <Modal
+          visible={modalVisible}
+          transparent={true}
+          animationType="fade"
+          onRequestClose={() => setModalVisible(false)} // Close the modal
         >
-            <TouchableOpacity // When i click outside, the modal disappears
-                style={style.modalOverlay}
-                activeOpacity={1}
-                onPress={() => setModalVisible(false)}
-            >
-                <View style={style.modalContent}>
+          <TouchableOpacity // When i click outside, the modal disappears
+            style={style.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setModalVisible(false)}
+          >
+            <View style={style.modalContent}>
+              <TouchableOpacity
+                style={style.modalOption}
+                onPress={() => handleAction("view")}
+              >
+                <Ionicons name="eye-outline" size={20} color="#333" />
+                <Text style={style.modalOptionText}>View</Text>
+              </TouchableOpacity>
 
-                    <TouchableOpacity 
-                        style={style.modalOption}
-                        onPress={() => handleAction("view")}
-                    >
-                        <Ionicons name="eye-outline" size={20} color="#333"/>
-                        <Text style={style.modalOptionText}>View</Text>
-                    </TouchableOpacity>
+              {isAdmin && (
+                <TouchableOpacity
+                  style={style.modalOption}
+                  onPress={() => handleAction("edit")}
+                >
+                  <Ionicons name="create-outline" size={20} color="#333" />
+                  <Text style={style.modalOptionText}>Edit</Text>
+                </TouchableOpacity>
+              )}
 
-                    <TouchableOpacity 
-                        style={style.modalOption}
-                        onPress={() => handleAction("edit")}
-                    >
-                        <Ionicons name="create-outline" size={20} color="#333"/>
-                        <Text style={style.modalOptionText}>Edit</Text>
-                    </TouchableOpacity>
-
-                    <TouchableOpacity 
-                        style={style.modalOption}
-                        onPress={() => handleAction("delete")}
-                    >
-                        <Ionicons name="trash-outline" size={20} color="#e74c3c"/>
-                        <Text style={[style.modalOptionText , {color: "#e74c3c"}]}>Delete</Text>
-                    </TouchableOpacity>
-                </View>
-
-            </TouchableOpacity>
+              {isAdmin && (
+                <TouchableOpacity
+                  style={style.modalOption}
+                  onPress={() => handleAction("delete")}
+                >
+                  <Ionicons name="trash-outline" size={20} color="#e74c3c" />
+                  <Text style={[style.modalOptionText, { color: "#e74c3c" }]}>
+                    Delete
+                  </Text>
+                </TouchableOpacity>
+              )}
+            </View>
+          </TouchableOpacity>
         </Modal>
-
       </View>
     </>
   );
@@ -323,6 +300,14 @@ const style = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     textAlign: "center",
+  },
+   logoutButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: "#1F41BB",
+    paddingVertical: height * 0.01,
+    paddingHorizontal: width * 0.03,
+    borderRadius: width * 0.03,
   },
   searchContainer: {
     paddingHorizontal: width * 0.05,

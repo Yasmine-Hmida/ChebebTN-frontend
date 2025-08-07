@@ -18,6 +18,8 @@ export default function RootLayout() {
           <Stack.Screen name="(auth)/Register" />
           <Stack.Screen name="(screens)/Home" />
           <Stack.Screen name="(screens)/Add" />
+          <Stack.Screen name="(screens)/Edit" />
+          <Stack.Screen name="(screens)/ViewPage" />
         </Stack>
       </>
   );

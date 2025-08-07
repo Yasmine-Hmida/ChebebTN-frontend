@@ -18,7 +18,6 @@ export default function ViewPage() {
 
   const parsedJob = JSON.parse(decodeURIComponent(selectedJob));
 
-  // Optional: format salary and date similar to Home screen
   const formatSalary = (salary: number) => `$${salary.toLocaleString()}`;
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
