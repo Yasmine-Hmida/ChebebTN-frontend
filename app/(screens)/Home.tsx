@@ -92,14 +92,42 @@ export default function Home() {
         });
         break;
       case "delete":
-        Alert.alert(
-          "Delete",
-          `Are you sure you want to delete the Job: ${selectedJob?.title} ?`,
-          [
-            { text: "Cancel", style: "cancel" },
-            { text: "Delete", style: "destructive" },
-          ]
-        );
+        if (selectedJob) {
+          Alert.alert(
+            "Delete",
+            `Are you sure you want to delete the Job: ${selectedJob?.title} ?`,
+            [
+              { text: "Cancel", style: "cancel" },
+              {
+                text: "Delete",
+                style: "destructive",
+                onPress: async () => {
+                  try {
+                    const token = await AsyncStorage.getItem("token");
+                    if (!token) {
+                      Alert.alert("Error", "No token available");
+                      return;
+                    }
+
+                    await axios.delete(
+                      `http://10.0.2.2:3000/api/jobs/${selectedJob._id}`,
+                      {
+                        headers: { Authorization: `Bearer ${token}` }
+                      }
+                    );
+
+                    await fetchJobs();
+
+                  } catch (err) {
+                    console.log(err);
+                    Alert.alert("Error", "Can't delete");
+                  }
+                },
+              },
+            ]
+          );
+        }
+
         break;
       case "view":
         router.push({
@@ -114,15 +142,14 @@ export default function Home() {
 
   // Handle Logout
   const handleLogout = () => {
-    try{
-      AsyncStorage.clear()
-      router.push("/(auth)/Login")
+    try {
+      AsyncStorage.clear();
+      router.push("/(auth)/Login");
+    } catch (err) {
+      console.error("Error clearing AsyncStorage", err);
+      Alert.alert("Error", "Error in loging out");
     }
-    catch(err){
-      console.error("Error clearing AsyncStorage" , err);
-      Alert.alert("Error" , "Error in loging out")
-    }
-  }
+  };
 
   // JobCard Component
   const JobCard: React.FC<{ item: Job }> = ({ item }) => (
@@ -185,11 +212,8 @@ export default function Home() {
         {/* Header */}
         <View style={style.header}>
           <Text style={style.headerTitle}>Jobs Available</Text>
-          <TouchableOpacity
-            style={style.logoutButton}
-            onPress={handleLogout}
-          >
-            <Ionicons name="log-out-outline" size={24} color="white"/>
+          <TouchableOpacity style={style.logoutButton} onPress={handleLogout}>
+            <Ionicons name="log-out-outline" size={24} color="white" />
           </TouchableOpacity>
         </View>
 
@@ -301,7 +325,7 @@ const style = StyleSheet.create({
     color: "white",
     textAlign: "center",
   },
-   logoutButton: {
+  logoutButton: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: "#1F41BB",
