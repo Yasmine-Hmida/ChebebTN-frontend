@@ -12,12 +12,12 @@ import {
   Alert,
 } from "react-native";
 import { router } from "expo-router";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { height, width } = Dimensions.get("window");
 
-// Fake Schema
+// Job Schema
 interface Job {
   _id: string;
   title: string;
@@ -30,7 +30,7 @@ interface Job {
   experienceLevel: string;
   skills: string[];
   applicationDeadline: string;
-  postedBy?: string; // Option ken fama wa7det fer8in
+  postedBy?: string; // Option : If we have it, then it's a string
   createdAt: string;
   updatedAt: string;
   applications: { userId: string; appliedAt: string; _id: string }[];
@@ -43,7 +43,7 @@ export default function Home() {
   const [isAdmin, setIsAdmin] = useState(false);
   const [jobs, setJobs] = useState<Job[]>([]);
 
-  // Get jobs from DB
+  // Get jobs from the Database
   const fetchJobs = async () => {
     try {
       const response = await axios.get("http://10.0.2.2:3000/api/jobs");
@@ -54,7 +54,7 @@ export default function Home() {
     }
   };
 
-  // Fetch data from backend and user role from asyncstorage
+  // Fetch data from backend and get the user role from AsyncStorage
   useEffect(() => {
     const checkUserRole = async () => {
       try {
@@ -79,23 +79,23 @@ export default function Home() {
     return date.toLocaleDateString(); // 2025-07-27T09:37:27.495Z => 31/08/2025
   };
 
-  // Handle Action
+  // Handle Action          -------------------------------------------------------------------------------------------------------
   const handleAction = (action: string) => {
-    setModalVisible(false);
+    setModalVisible(false); // Setting the modal invisible before navigating to the other page
     switch (action) {
       case "edit":
-        router.push({
-          pathname: "/(screens)/Edit",
-          params: {
-            selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
-          },
-        });
+        if (selectedJob) {
+          router.push({
+            pathname: "/(screens)/(Edit)/[id]",
+            params: { id: selectedJob._id },
+          });
+        }
         break;
       case "delete":
         if (selectedJob) {
           Alert.alert(
             "Delete",
-            `Are you sure you want to delete the Job: ${selectedJob?.title} ?`,
+            `Are you sure you want to delete the job: ${selectedJob.title}?`,
             [
               { text: "Cancel", style: "cancel" },
               {
@@ -105,37 +105,42 @@ export default function Home() {
                   try {
                     const token = await AsyncStorage.getItem("token");
                     if (!token) {
-                      Alert.alert("Error", "No token available");
+                      Alert.alert(
+                        "Error",
+                        "Token not Found!"
+                      );
                       return;
                     }
-
                     await axios.delete(
                       `http://10.0.2.2:3000/api/jobs/${selectedJob._id}`,
                       {
-                        headers: { Authorization: `Bearer ${token}` }
+                        headers: { Authorization: `Bearer ${token}` },
                       }
                     );
 
+                    // Refetch jobs to refresh the list
                     await fetchJobs();
-
-                  } catch (err) {
-                    console.log(err);
-                    Alert.alert("Error", "Can't delete");
+                  } catch (error) {
+                    const err = error as AxiosError<{ message?: string }>;
+                    Alert.alert(
+                      "Error",
+                      err.response?.data?.message ||
+                        "Unable to Delete the Job!"
+                    );
                   }
                 },
               },
             ]
           );
         }
-
         break;
       case "view":
-        router.push({
-          pathname: "/(screens)/ViewPage",
-          params: {
-            selectedJob: encodeURIComponent(JSON.stringify(selectedJob)),
-          },
-        });
+        if (selectedJob) {
+          router.push({
+            pathname: "/(screens)/(JobDetails)/[id]",
+            params: { id: selectedJob._id },
+          });
+        }
         break;
     }
   };
@@ -143,10 +148,10 @@ export default function Home() {
   // Handle Logout
   const handleLogout = () => {
     try {
-      AsyncStorage.clear();
+      AsyncStorage.clear(); // Clear the token, userId and role
       router.push("/(auth)/Login");
     } catch (err) {
-      console.error("Error clearing AsyncStorage", err);
+      console.error("Error in Clearing the AsyncStorage", err);
       Alert.alert("Error", "Error in loging out");
     }
   };
@@ -237,7 +242,7 @@ export default function Home() {
         </View>
 
         {/* Add Job */}
-        {isAdmin ? (
+        {isAdmin && (
           <TouchableOpacity
             style={style.addButton}
             onPress={() => router.push("/(screens)/Add")}
@@ -245,8 +250,6 @@ export default function Home() {
             <Ionicons name="add" size={24} color="white" />
             <Text style={style.addButtonText}>Add a job</Text>
           </TouchableOpacity>
-        ) : (
-          <></>
         )}
 
         {/* List of jobs */}
@@ -265,7 +268,7 @@ export default function Home() {
           animationType="fade"
           onRequestClose={() => setModalVisible(false)} // Close the modal
         >
-          <TouchableOpacity // When i click outside, the modal disappears
+          <TouchableOpacity // When I click outside, the modal disappears
             style={style.modalOverlay}
             activeOpacity={1}
             onPress={() => setModalVisible(false)}
@@ -389,9 +392,9 @@ const style = StyleSheet.create({
     padding: width * 0.05,
     marginBottom: height * 0.02,
     elevation: 3,
-    shadowColor: "#000",
+    shadowColor: "#1F41BB",
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
   cardHeader: {
@@ -442,7 +445,7 @@ const style = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   skillTag: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#bcc5e7ff",
     paddingHorizontal: width * 0.03,
     paddingVertical: height * 0.008,
     borderRadius: width * 0.05,

@@ -22,7 +22,7 @@ export default function Index() {
 
 const style = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 1, // Takes up all the screen space
     backgroundColor: "#FFFFFF",
     justifyContent: "center",
     alignItems: "center",

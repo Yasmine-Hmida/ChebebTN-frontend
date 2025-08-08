@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Alert,
   Dimensions,
@@ -11,11 +11,34 @@ import {
 } from "react-native";
 import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 
 const { width, height } = Dimensions.get("window");
 
-const AddJob: React.FC = () => {
+// Interface Job
+interface Job {
+  _id: string;
+  title: string;
+  company: string;
+  description: string;
+  salary: number;
+  location: string;
+  jobType: string;
+  status: string;
+  experienceLevel: string;
+  skills: string[];
+  applicationDeadline: string;
+  postedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+  applications: { userId: string; appliedAt: string; _id: string }[];
+}
+
+const EditJob: React.FC = () => {
+  // Retrieve id from URL params
+  const { id } = useLocalSearchParams();
+
+  // formData State
   const [formData, setFormData] = useState({
     title: "",
     company: "",
@@ -29,13 +52,63 @@ const AddJob: React.FC = () => {
     status: "Open",
   });
 
-  const handleInputChange = (field: string, value: string) => {
+  // Loading State
+  const [loading, setLoading] = useState(true);
+
+  // Retreive Job details on mount
+  useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const token = await AsyncStorage.getItem("token");
+        if (!token) {
+          Alert.alert("Error", "No Token found!");
+          router.push("/(screens)/home");
+          return;
+        }
+
+        const response = await axios.get(
+          `http://10.0.2.2:3000/api/jobs/${id}`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        const job: Job = response.data;
+        setFormData({
+          title: job.title,
+          company: job.company,
+          description: job.description,
+          location: job.location,
+          salary: job.salary.toString(),
+          jobType: job.jobType,
+          experienceLevel: job.experienceLevel,
+          skills: job.skills.join(", "),
+          applicationDeadline: job.applicationDeadline.split("T")[0], // Format YYYY-MM-DD
+          status: job.status,
+        });
+        setLoading(false);
+      } catch (error) {
+        const err = error as AxiosError<{ message?: string }>;
+        Alert.alert(
+          "Error",
+          err.response?.data?.message || "Unable to load the Job details!"
+        );
+        router.push("/(screens)/home");
+      }
+    };
+
+    fetchJob();
+  }, [id]);
+
+  // Mange the form changes
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // onSubmit
   const handleSubmit = async () => {
     try {
-      // Validate Inputs
+      // Input Validation
       const requiredFields: (keyof typeof formData)[] = [
         "title",
         "company",
@@ -49,7 +122,7 @@ const AddJob: React.FC = () => {
       ];
       for (const field of requiredFields) {
         if (!formData[field]) {
-          Alert.alert("Error", `The ${field} is required!`);
+          Alert.alert("Error", `The ${field} is required to fill!`);
           return;
         }
       }
@@ -60,13 +133,13 @@ const AddJob: React.FC = () => {
         return;
       }
 
-      // Convert skills in array
+      // Convert skills to an array
       const skills = formData.skills
         .split(",")
         .map((skill) => skill.trim())
-        .filter((skill) => skill);
+        .filter((skill) => skill); // Removes "", null, undefined, 0, etc.
 
-      // Verify deadline
+      // Verify the Date
       const deadline = new Date(formData.applicationDeadline);
       if (isNaN(deadline.getTime())) {
         Alert.alert(
@@ -79,22 +152,22 @@ const AddJob: React.FC = () => {
       // Retrieve the token
       const token = await AsyncStorage.getItem("token");
       if (!token) {
-        Alert.alert("Error", "No token found!");
+        Alert.alert("Error", "No Token found!");
         return;
       }
 
-      // Send the POST Request
-      await axios.post(
-        "http://10.0.2.2:3000/api/jobs",
+      // Send the PUT request
+      await axios.put(
+        `http://10.0.2.2:3000/api/jobs/${id}`,
         {
           title: formData.title,
           company: formData.company,
           description: formData.description,
           location: formData.location,
-          salary,
+          salary: salary,
           jobType: formData.jobType,
           experienceLevel: formData.experienceLevel,
-          skills,
+          skills: skills,
           applicationDeadline: formData.applicationDeadline,
           status: formData.status,
         },
@@ -103,7 +176,7 @@ const AddJob: React.FC = () => {
         }
       );
 
-      Alert.alert("Success", "Job Added Successfully!", [
+      Alert.alert("Success", "Job Edited Successfully", [
         {
           text: "OK",
           onPress: () => router.push("/(screens)/home"),
@@ -113,15 +186,23 @@ const AddJob: React.FC = () => {
       const err = error as AxiosError<{ message?: string }>;
       Alert.alert(
         "Error",
-        err.response?.data?.message || "Unable to add the Job!"
+        err.response?.data?.message || "Unable to Edit the Job!"
       );
     }
   };
 
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.headerTitle}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Add a new job</Text>
+        <Text style={styles.headerTitle}>Edit the Job</Text>
       </View>
 
       <View style={styles.formContainer}>
@@ -165,7 +246,7 @@ const AddJob: React.FC = () => {
         />
         <TextInput
           style={styles.input}
-          placeholder="Job type (ex: Full-time)"
+          placeholder="Job Type (ex: Full-time)"
           value={formData.jobType}
           onChangeText={(text) => handleInputChange("jobType", text)}
           placeholderTextColor="#999"
@@ -179,7 +260,7 @@ const AddJob: React.FC = () => {
         />
         <TextInput
           style={styles.input}
-          placeholder="Skills (',' separated)"
+          placeholder="Skills (',' Separated)"
           value={formData.skills}
           onChangeText={(text) => handleInputChange("skills", text)}
           placeholderTextColor="#999"
@@ -202,7 +283,7 @@ const AddJob: React.FC = () => {
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Add job</Text>
+          <Text style={styles.submitButtonText}>Update the Job</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -265,4 +346,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default AddJob;
+export default EditJob;

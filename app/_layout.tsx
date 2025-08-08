@@ -13,6 +13,7 @@ export default function RootLayout() {
             headerShown: false 
           }}
         >
+          {/* Define our screens */}
           <Stack.Screen name="index" />
           <Stack.Screen name="(auth)/Login" />
           <Stack.Screen name="(auth)/Register" />

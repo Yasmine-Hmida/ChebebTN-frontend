@@ -1,27 +1,23 @@
-import { Ionicons } from "@expo/vector-icons"; // Importation pour les icônes
+import { Ionicons } from "@expo/vector-icons"; // Icons
 import { router } from "expo-router";
 import React, { useState } from "react";
 import {
-    Alert,
-    Dimensions,
-    ScrollView,
-    StatusBar,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Dimensions,
+  ScrollView,
+  StatusBar,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
-import axios from "axios" // fetch (more secure)
+import axios from "axios";
 
-// Récupération des dimensions de l'écran pour un design responsive
 const { width, height } = Dimensions.get("window");
 
-/**
- * Interface TypeScript pour définir la structure des données du formulaire
- * Aide à avoir un code plus robuste et éviter les erreurs
- */
+// A TypeScript Interface to define the structure of our form
 interface FormData {
   username: string;
   email: string;
@@ -29,27 +25,24 @@ interface FormData {
   repeatPassword: string;
 }
 
-/**
- * Composant de la page d'inscription
- * Permet à un nouvel utilisateur de créer un compte sur ChabebTN
- */
+// Our Register Component
 const RegisterScreen = () => {
-  // État pour stocker toutes les données du formulaire
+  // A State to stock all the data from the form
   const [formData, setFormData] = useState<FormData>({
     username: "",
     email: "",
     password: "",
     repeatPassword: "",
   });
-  const [isAdmin , setIsAdmin] = useState(false);
-  const [focusedInput, setFocusedInput] = useState(""); // État pour gérer le focus des inputs
-  const [showPassword, setShowPassword] = useState(false); // État pour la visibilité du mot de passe
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // État pour la visibilité de la confirmation
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [focusedInput, setFocusedInput] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   /**
-   * Fonction générique pour mettre à jour n'importe quel champ du formulaire
-   * @param field - Le nom du champ à modifier
-   * @param value - La nouvelle valeur
+   * A generic function to update any form field from "formData"
+   * @param field - The name of the field to be modified
+   * @param value - The new Value
    */
   const handleInputChange = (field: keyof FormData, value: string) => {
     setFormData((prev) => ({
@@ -59,53 +52,49 @@ const RegisterScreen = () => {
   };
 
   /**
-   * Fonction de validation complète du formulaire
-   * Vérifie tous les critères avant de permettre l'inscription
-   * @returns true si tout est valide, false sinon
+   * Form Validation Function
+   * @returns true if all is valid, otherwise false
    */
   const validateForm = (): boolean => {
-    const { username, email, password, repeatPassword } = formData;
+    const { username, email, password, repeatPassword } = formData; // Destructuring
 
-    // Vérifier que tous les champs sont remplis
+    // Verify if any field is empty
     if (!username || !email || !password || !repeatPassword) {
-      Alert.alert("Erreur", "Veuillez remplir tous les champs");
+      Alert.alert("Error", "Please Fill all the Fields!");
       return false;
     }
 
-    // Vérifier la longueur du nom (au moins 2 caractères)
+    // Verify the Username Length (At least 2 Characters)
     if (username.length < 2) {
-      Alert.alert("Erreur", "Le nom doit contenir au moins 2 caractères");
+      Alert.alert("Error", "The Username must contain at least 2 characters!");
       return false;
     }
 
-    // Vérifier le format de l'email avec une regex
+    // Verify the Email Format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
-      Alert.alert("Erreur", "Format email invalide");
+      Alert.alert("Error", "Invalid Email Format!");
       return false;
     }
 
-    // Vérifier la force du mot de passe (au moins 8 caractères)
+    // Verify the Password Length (At least 8 characters)
     if (password.length < 8) {
-      Alert.alert(
-        "Erreur",
-        "Le mot de passe doit contenir au moins 8 caractères"
-      );
+      Alert.alert("Error", "The Password must contain at least 8 Characters!");
       return false;
     }
-    // Vérifier la présence d'au moins une lettre majuscule
+    // Verify if the password contains at least one capital letter
     const capitalLetterRegex = /[A-Z]/;
     if (!capitalLetterRegex.test(password)) {
       Alert.alert(
-        "Erreur",
-        "Le mot de passe doit contenir au moins une lettre majuscule"
+        "Error",
+        "The Password must contain at least one capital letter"
       );
       return false;
     }
 
-    // Vérifier que les deux mots de passe correspondent
+    // Verify the matching passwords
     if (password !== repeatPassword) {
-      Alert.alert("Erreur", "Les mots de passe ne correspondent pas");
+      Alert.alert("Error", "Passwords do not match!");
       return false;
     }
 
@@ -113,101 +102,104 @@ const RegisterScreen = () => {
   };
 
   /**
-   * Fonction qui gère la tentative d'inscription
-   * Valide les données puis simule la création de compte
+   * Registration function
    */
   const handleRegister = async () => {
     if (!validateForm()) {
       return;
     }
 
-    try{
-      const response = await axios.post("http://10.0.2.2:3000/api/register" , {
+    try {
+      const response = await axios.post("http://10.0.2.2:3000/api/register", {
         username: formData.username,
         email: formData.email,
         password: formData.password,
         repeatPassword: formData.repeatPassword,
-        role: isAdmin? 'Admin' : 'Job Seeker'
+        role: isAdmin ? "Admin" : "Job Seeker",
       });
 
-      if(response.data.status === "Success"){
-        Alert.alert("Success" , `Registered Successfully ${formData.username} , your new account is saved !`, [
-          {
-            text: "OK",
-            onPress:() => router.push("/(auth)/Login")
-          }
-        ])
+      if (response.status === 200) {
+        Alert.alert(
+          "Success",
+          `Registered Successfully ${formData.username} , Your new Account is Saved !`,
+          [
+            {
+              text: "OK",
+              onPress: () => router.push("/(auth)/Login"),
+            },
+          ]
+        );
+      } else {
+        Alert.alert("Error", response.data.message || "Failed to Register!");
+      }
+    } catch (err: any) {
+      if (err.response && err.response.status === 400) {
+        Alert.alert(
+          "Error",
+          err.response.data.message || "Failed to Register!"
+        );
       }
       else{
-        Alert.alert("Error", response.data.message || "Failed to Register!")
+        console.log("Error: ", err);
+        Alert.alert("Error", "Register Error");
       }
-    }
-    catch(err){
-      console.log("Erreur: " , err);
-      Alert.alert("Error", "Register Error")
     }
   };
 
   /**
-   * Fonction pour naviguer vers la page de connexion
+   * Redirection to the Login Page
    */
   const goToLogin = () => {
     router.push("/(auth)/Login");
   };
 
-  /**
-   * Fonction pour basculer la visibilité du mot de passe
-   */
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
-  /**
-   * Fonction pour basculer la visibilité de la confirmation du mot de passe
-   */
   const toggleShowConfirmPassword = () => {
     setShowConfirmPassword(!showConfirmPassword);
   };
 
   const toggleAdminCheckbox = () => {
-    setIsAdmin(!isAdmin)
-  }
+    setIsAdmin(!isAdmin);
+  };
 
   return (
     <>
-      {/* Configuration de la barre de statut pour un design moderne */}
-      <StatusBar barStyle="light-content" backgroundColor="#1F41BB" />
+      <StatusBar barStyle="dark-content" />
 
-      {/* Container principal */}
       <View style={styles.container}>
+
         <ScrollView contentContainerStyle={styles.scrollContainer}>
-          {/* Section supérieure avec titre et sous-titre */}
+          {/* Header Section */}
           <View style={styles.headerSection}>
-            <Text style={styles.mainTitle}>Rejoindre ChabebTN</Text>
-            <Text style={styles.welcomeText}>Créez votre compte</Text>
+            <Text style={styles.mainTitle}>Join ChebebTN</Text>
+            <Text style={styles.welcomeText}>Create Your Account</Text>
           </View>
 
-          {/* Section du formulaire */}
+          {/* Form Section */}
           <View style={styles.formSection}>
-            {/* Champ Nom complet */}
+
+            {/* Username Input */}
             <View style={styles.inputContainer}>
               <TextInput
                 style={[
                   styles.input,
                   focusedInput === "name" && styles.inputFocused,
                 ]}
-                placeholder="Nom complet"
+                placeholder="Username"
                 placeholderTextColor="#626262"
                 value={formData.username}
                 onChangeText={(value) => handleInputChange("username", value)}
                 onFocus={() => setFocusedInput("name")}
                 onBlur={() => setFocusedInput("")}
-                autoCapitalize="words"
-                autoComplete="name"
+                autoCapitalize="words" // Controls how the text input capitalizes letters automatically while typing
+                autoComplete="name"    // Helps the user type less by suggesting stored names
               />
             </View>
 
-            {/* Champ Email */}
+            {/* Email Input */}
             <View style={styles.inputContainer}>
               <TextInput
                 style={[
@@ -226,7 +218,7 @@ const RegisterScreen = () => {
               />
             </View>
 
-            {/* Champ Mot de passe */}
+            {/* Password Input */}
             <View style={styles.inputContainer}>
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -235,7 +227,7 @@ const RegisterScreen = () => {
                     focusedInput === "password" && styles.inputFocused,
                     styles.passwordInput,
                   ]}
-                  placeholder="Mot de passe (min. 8 caractères)"
+                  placeholder="Password (min: 8 Characterss)"
                   placeholderTextColor="#626262"
                   value={formData.password}
                   onChangeText={(value) => handleInputChange("password", value)}
@@ -249,7 +241,7 @@ const RegisterScreen = () => {
                   onPress={toggleShowPassword}
                 >
                   <Ionicons
-                    name={showPassword ? "eye" : "eye-off"}
+                    name={showPassword ? "eye-off" : "eye"}
                     size={width * 0.06}
                     color="#626262"
                   />
@@ -257,7 +249,7 @@ const RegisterScreen = () => {
               </View>
             </View>
 
-            {/* Champ Confirmation mot de passe */}
+            {/* repeatPassword Input */}
             <View style={styles.inputContainer}>
               <View style={styles.passwordContainer}>
                 <TextInput
@@ -266,7 +258,7 @@ const RegisterScreen = () => {
                     focusedInput === "confirmPassword" && styles.inputFocused,
                     styles.passwordInput,
                   ]}
-                  placeholder="Confirmer le mot de passe"
+                  placeholder="Confirm Password"
                   placeholderTextColor="#626262"
                   value={formData.repeatPassword}
                   onChangeText={(value) =>
@@ -281,44 +273,45 @@ const RegisterScreen = () => {
                   onPress={toggleShowConfirmPassword}
                 >
                   <Ionicons
-                    name={showConfirmPassword ? "eye" : "eye-off"}
+                    name={showConfirmPassword ? "eye-off" : "eye"}
                     size={width * 0.06}
                     color="#626262"
                   />
                 </TouchableOpacity>
               </View>
             </View>
-            
-            {/* Choix de admin ou nom */}
+
+            {/* Admin Checkbox */}
             <View style={styles.checkboxContainer}>
-                  <TouchableOpacity
-                    style={styles.checkbox}
-                    onPress={toggleAdminCheckbox}
-                  >
-                    <Ionicons name={isAdmin? "checkbox": "square-outline"} 
-                              size={width * 0.06} 
-                              color={isAdmin?"#1F41BB" : "#626262"}
-                    />
-                  </TouchableOpacity>
-                  <Text style={styles.checkboxLabel}>I&apos;m an admin</Text>
+              <TouchableOpacity
+                style={styles.checkbox}
+                onPress={toggleAdminCheckbox}
+              >
+                <Ionicons
+                  name={isAdmin ? "checkbox" : "square-outline"}
+                  size={width * 0.06}
+                  color={isAdmin ? "#1F41BB" : "#626262"}
+                />
+              </TouchableOpacity>
+              <Text style={styles.checkboxLabel}>I&apos;m an admin</Text>
             </View>
 
-            {/* Bouton d'inscription */}
+            {/* Register Button */}
             <TouchableOpacity
               style={styles.signInButton}
               onPress={handleRegister}
               activeOpacity={0.8}
             >
-              <Text style={styles.signInButtonText}>Créer mon compte</Text>
+              <Text style={styles.signInButtonText}>Register</Text>
             </TouchableOpacity>
 
-            {/* Lien vers la connexion */}
+            {/* Go to Login */}
             <TouchableOpacity
               style={styles.createAccountContainer}
               onPress={goToLogin}
             >
               <Text style={styles.createAccountText}>
-                Déjà un compte ? Se connecter
+                Already have an account ? Login
               </Text>
             </TouchableOpacity>
           </View>
@@ -328,87 +321,85 @@ const RegisterScreen = () => {
   );
 };
 
-// Styles suivant le design de LoginScreen
 const styles = StyleSheet.create({
-  // Container principal occupant tout l'écran
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF", // Fond blanc comme dans LoginScreen
+    backgroundColor: "#FFFFFF", 
   },
 
-  // ScrollView pour gérer le défilement
+  // ScrollView for scrolling
   scrollContainer: {
-    flexGrow: 1,
+    flexGrow: 1, // Expand to take up all remaining space if possible
   },
 
-  // Section supérieure avec le titre et message de bienvenue
+  // Header Section
   headerSection: {
-    height: height * 0.3, // 30% de la hauteur de l'écran
+    height: height * 0.3, // 30% of the window height
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: width * 0.05, // 5% de la largeur pour les marges
+    paddingHorizontal: width * 0.05
   },
 
-  // Titre principal "Rejoindre ChabebTN" en bleu
+  // Title: "Join ChebebTN"
   mainTitle: {
-    fontSize: width * 0.08, // Taille relative à la largeur de l'écran
+    fontSize: width * 0.08,
     fontWeight: "bold",
-    color: "#1F41BB", // Couleur bleue exacte
-    marginBottom: height * 0.03, // 3% de la hauteur pour l'espacement
+    color: "#1F41BB",
+    marginBottom: height * 0.03, 
     textAlign: "center",
   },
 
-  // Message de bienvenue en noir
+  // "Create Your Account" message
   welcomeText: {
-    fontSize: width * 0.05, // Taille relative à la largeur
+    fontSize: width * 0.05, 
     color: "#000000",
     textAlign: "center",
-    lineHeight: height * 0.04, // Interligne relatif à la hauteur
-    fontWeight: "600",
+    lineHeight: height * 0.04,
+    fontWeight: "500",
   },
 
-  // Section contenant le formulaire
+  // Form Section
   formSection: {
-    height: height * 0.6, // 60% de la hauteur de l'écran
-    paddingHorizontal: width * 0.08, // 8% de la largeur pour les marges
+    height: height * 0.6, 
+    paddingHorizontal: width * 0.08,
   },
 
-  // Container pour chaque champ de saisie
+  // Input Containers
   inputContainer: {
-    marginBottom: height * 0.03, // 3% de la hauteur pour l'espacement
+    marginBottom: height * 0.03,
   },
 
-  // Style des champs de saisie
+  // TextInputs
   input: {
-    height: height * 0.08, // 8% de la hauteur de l'écran
-    width: width * 0.84, // 84% de la largeur de l'écran
+    height: height * 0.08, 
+    width: width * 0.84, 
     backgroundColor: "#F1F4FF",
-    borderRadius: width * 0.025, // Coins arrondis relatifs à la largeur
-    paddingHorizontal: width * 0.05, // Padding horizontal relatif
-    fontSize: width * 0.04, // Taille de police relative
-    color: "#626262",
-    borderWidth: 1, // Bordure de 1px par défaut
+    borderRadius: width * 0.025, 
+    paddingHorizontal: width * 0.05, 
+    fontSize: width * 0.04,
+    color: "black",
+    borderWidth: 1, 
     borderColor: "#1F41BB",
   },
 
-  // Style appliqué quand l'input est focus
+  // When Input is focused on
   inputFocused: {
-    borderWidth: 3, // Bordure de 3px quand l'utilisateur écrit
+    borderWidth: 3,
   },
 
-  // Container pour le champ mot de passe avec icône
+  // Password Container
   passwordContainer: {
     flexDirection: "row",
     alignItems: "center",
     width: width * 0.84,
   },
 
-  // Input du mot de passe avec espace pour l'icône
+  // The Password Input
   passwordInput: {
     flex: 1,
   },
 
-  // Style pour l'icône œil
+  // Eye Icon
   eyeIcon: {
     position: "absolute",
     right: width * 0.03,
@@ -418,43 +409,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.02,
   },
 
-  // Bouton "Créer mon compte" avec fond bleu
+  // Register Button
   signInButton: {
-    height: height * 0.075, // 7.5% de la hauteur de l'écran
-    width: width * 0.84, // 84% de la largeur de l'écran
-    backgroundColor: "#1F41BB", // Couleur bleue exacte
-    borderRadius: width * 0.025, // Coins arrondis relatifs
+    height: height * 0.075,
+    width: width * 0.84, 
+    backgroundColor: "#1F41BB", 
+    borderRadius: width * 0.025, 
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: height * 0.04, // 4% de la hauteur pour l'espacement
+    marginBottom: height * 0.04,
     shadowColor: "#1F41BB",
     shadowOffset: {
       width: 0,
-      height: height * 0.005, // Ombre relative à la hauteur
+      height: height * 0.005, // Shadow Height
     },
     shadowOpacity: 0.3,
-    shadowRadius: width * 0.02, // Rayon d'ombre relatif
-    elevation: 8, // Ombre sur Android
+    shadowRadius: width * 0.02,
+    elevation: 8, // Shadow in Android
   },
 
-  // Texte du bouton "Créer mon compte" en blanc
+  // Register Text
   signInButtonText: {
     color: "#FFFFFF",
-    fontSize: width * 0.05, // Taille relative à la largeur
+    fontSize: width * 0.05, 
     fontWeight: "bold",
   },
 
-  // Container pour le lien "Déjà un compte ? Se connecter"
+  // Container for the link "Already have an account ? Login"
   createAccountContainer: {
     alignItems: "center",
     marginTop: height * 0.01, // 1.5% de la hauteur pour l'espacement
   },
 
-  // Texte du lien "Déjà un compte ? Se connecter" en gris foncé
+  // Link to the Login Page
   createAccountText: {
-    fontSize: width * 0.035, // Taille relative à la largeur
+    fontSize: width * 0.035, 
     color: "#494949",
-    fontWeight: "600",
+    fontWeight: "400",
   },
   // Container pour le checkbox
   checkboxContainer: {
@@ -474,7 +465,7 @@ const styles = StyleSheet.create({
   // Style pour le label du checkbox
   checkboxLabel: {
     fontSize: width * 0.04,
-    color: "#626262",
+    color: "black",
     marginLeft: width * 0.02,
   },
 });
