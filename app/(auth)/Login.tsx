@@ -88,10 +88,15 @@ export default function LoginScreen() {
 
       <View style={style.container}>
         <View style={style.headerSection}>
-          <Text style={style.mainText}>Login</Text>
+          <Text style={style.mainText}>Sign In</Text>
           <Text style={style.welcomeText}>
             {" "}
-            Welcome Back to ChebebTN{"\n"} You&apos;ve been Missed
+            Welcome Back to{" "}
+            <Text style={[style.welcomeText, style.welcomeMainText]}>
+              ChebebTN
+            </Text>
+            {"\n"}
+            You&apos;ve been Missed
           </Text>
         </View>
 
@@ -103,7 +108,7 @@ export default function LoginScreen() {
                 focusedInput === "email" && style.inputFocused,
               ]} // If the Currently focused input is "email", apply the "inputFocused" style
               placeholder="Email"
-              placeholderTextColor="#626262"
+              placeholderTextColor="#000000"
               value={email}
               onChangeText={setEmail}
               onFocus={() => setFocusedInput("email")}
@@ -119,7 +124,7 @@ export default function LoginScreen() {
                   focusedInput === "password" && style.inputFocused,
                 ]}
                 placeholder="Password"
-                placeholderTextColor="#626262"
+                placeholderTextColor="#000000"
                 value={password}
                 onChangeText={setPassword}
                 onFocus={() => setFocusedInput("password")}
@@ -134,7 +139,7 @@ export default function LoginScreen() {
                 <Ionicons
                   name={showPassword ? "eye-off" : "eye"}
                   size={width * 0.06}
-                  color="#626262"
+                  color="#800e13"
                 />
               </TouchableOpacity>
             </View>
@@ -145,8 +150,34 @@ export default function LoginScreen() {
             onPress={handleLogin}
             activeOpacity={0.8}
           >
-            <Text style={style.loginText}>Login</Text>
+            <Text style={style.loginText}>Sign In</Text>
           </TouchableOpacity>
+
+          {/* Or Sign In with Google or facebook section */}
+          <View>
+            <View style={style.orContainer}>
+              <View style={style.line} />
+              <Text style={style.text}>Or</Text>
+              <View style={style.line} />
+            </View>
+          </View>
+
+          <View style={style.outsideIcons}>
+            <TouchableOpacity style={style.outsideIcon} activeOpacity={0.7}>
+              <Ionicons
+                name="logo-google"
+                size={width * 0.11}
+                color="#800e13"
+              />
+            </TouchableOpacity>
+            <TouchableOpacity style={style.outsideIcon} activeOpacity={0.7}>
+              <Ionicons
+                name="logo-facebook"
+                size={width * 0.11}
+                color="#800e13"
+              />
+            </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
             style={style.createAccountBtn}
@@ -154,7 +185,8 @@ export default function LoginScreen() {
             activeOpacity={0.8} // Controls how much the button fades (becomes transparent) when the user presses it
           >
             <Text style={style.createAccountText}>
-              Don&apos;t have an account? Register
+              Don&apos;t have an account?{" "}
+              <Text style={style.createAccountTextLink}>Sign Up</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -166,27 +198,31 @@ export default function LoginScreen() {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#f6ededff",
   },
   headerSection: {
-    height: height * 0.4,
+    height: height * 0.3,
     justifyContent: "center",
     alignItems: "center",
     paddingHorizontal: width * 0.05, // Sets left and right padding of a component equally
   },
   mainText: {
+    fontFamily: "DosisExtraBold",
     fontSize: width * 0.08,
-    fontWeight: "bold",
-    color: "#1F41BB",
+    color: "#640d14",
     marginBottom: height * 0.02,
     textAlign: "center",
   },
   welcomeText: {
-    fontSize: width * 0.05,
-    color: "000000",
+    fontFamily: "DosisRegular",
+    fontSize: width * 0.06,
+    color: "#000000",
     textAlign: "center",
     lineHeight: height * 0.04,
-    fontWeight: "500",
+  },
+  welcomeMainText: {
+    fontFamily: "DosisExtraBold",
+    color: "#800e13",
   },
   formSection: {
     height: height * 0.6,
@@ -199,13 +235,14 @@ const style = StyleSheet.create({
   input: {
     height: height * 0.08,
     width: width * 0.84,
-    backgroundColor: "#F1F4FF",
+    backgroundColor: "#f7dedfc7",
     borderRadius: width * 0.025,
     paddingHorizontal: width * 0.05,
-    fontSize: width * 0.04,
+    fontFamily: "DosisMedium",
+    fontSize: width * 0.045,
     color: "black",
     borderWidth: 1,
-    borderColor: "#1F41BB",
+    borderColor: "#800e13",
   },
   inputFocused: {
     borderWidth: 3,
@@ -226,11 +263,11 @@ const style = StyleSheet.create({
   loginBtn: {
     height: height * 0.075,
     width: width * 0.84,
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: height * 0.04,
-    shadowColor: "#1F41BB",
+    shadowColor: "#800e13",
     shadowOffset: {
       // Tells the Component where the shadow should be placed horizontally(width) and vertically(height)
       width: 0,
@@ -243,16 +280,47 @@ const style = StyleSheet.create({
   },
   loginText: {
     color: "#FFFFFF",
-    fontSize: width * 0.05,
-    fontWeight: "bold",
+    fontSize: width * 0.06,
+    fontFamily: "DosisBold",
   },
   createAccountBtn: {
     alignItems: "center",
     marginTop: height * 0.02,
   },
   createAccountText: {
-    fontSize: width * 0.035,
+    fontSize: width * 0.038,
     color: "#494949",
-    fontWeight: "400",
+    fontFamily: "DosisMedium",
   },
+  createAccountTextLink: {
+    fontSize: width * 0.04,
+    color: "#800e13",
+    fontFamily: "DosisBold",
+  },
+  orContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#640d14",
+  },
+  text: {
+    marginHorizontal: 10,
+    fontSize: 20,
+    fontFamily: "DosisBold",
+    color: "#800e13",
+  },
+  outsideIcons: {
+    marginTop: 10,
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  outsideIcon: {
+    marginHorizontal: 15
+  }
 });

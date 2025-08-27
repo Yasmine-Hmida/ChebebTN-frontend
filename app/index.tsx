@@ -13,9 +13,9 @@ export default function Index() {
 
   return (
     <View style={style.container}>
-      <Text style={style.title}>Welcome</Text>
-      <Text style={style.subtitle}>Loading...</Text>
-      <ActivityIndicator size="large" color="#007AFF" style={style.loader} />
+      <Text style={style.title}>Welcome to ChebebTN</Text>
+      <Text style={style.subtitle}>App Loading...</Text>
+      <ActivityIndicator size="large" color="#800e13" style={style.loader} />
     </View>
   );
 }
@@ -23,19 +23,19 @@ export default function Index() {
 const style = StyleSheet.create({
   container: {
     flex: 1, // Takes up all the screen space
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#f6ededff",
     justifyContent: "center",
     alignItems: "center",
   },
   title: {
     fontSize: 24,
     fontWeight: "bold",
-    color: "#1F41BB",
+    color: "#640d14",
     textAlign: "center",
   },
   subtitle: {
     fontSize: 16,
-    color: "#666",
+    color: "#000000",
     marginBottom: 10,
     textAlign: "center",
   },

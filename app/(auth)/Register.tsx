@@ -118,7 +118,7 @@ const RegisterScreen = () => {
         role: isAdmin ? "Admin" : "Job Seeker",
       });
 
-      if (response.status === 200) {
+      if (response.status === 201) {
         Alert.alert(
           "Success",
           `Registered Successfully ${formData.username} , Your new Account is Saved !`,
@@ -134,13 +134,13 @@ const RegisterScreen = () => {
       }
     } catch (err: any) {
       if (err.response && err.response.status === 400) {
+        console.log(err)
         Alert.alert(
           "Error",
           err.response.data.message || "Failed to Register!"
         );
-      }
-      else{
-        console.log("Error: ", err);
+      } else {
+        console.log(err)
         Alert.alert("Error", "Register Error");
       }
     }
@@ -170,8 +170,11 @@ const RegisterScreen = () => {
       <StatusBar barStyle="dark-content" />
 
       <View style={styles.container}>
-
-        <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <ScrollView
+          contentContainerStyle={styles.scrollContainer}
+          keyboardShouldPersistTaps="handled"   // This controls what happens when you tap inside the scroll area while the keyboard is open
+          showsVerticalScrollIndicator={false}  // This controls whether the scrollbar on the right side is visible
+        >
           {/* Header Section */}
           <View style={styles.headerSection}>
             <Text style={styles.mainTitle}>Join ChebebTN</Text>
@@ -180,7 +183,6 @@ const RegisterScreen = () => {
 
           {/* Form Section */}
           <View style={styles.formSection}>
-
             {/* Username Input */}
             <View style={styles.inputContainer}>
               <TextInput
@@ -189,13 +191,13 @@ const RegisterScreen = () => {
                   focusedInput === "name" && styles.inputFocused,
                 ]}
                 placeholder="Username"
-                placeholderTextColor="#626262"
+                placeholderTextColor="#000"
                 value={formData.username}
                 onChangeText={(value) => handleInputChange("username", value)}
                 onFocus={() => setFocusedInput("name")}
                 onBlur={() => setFocusedInput("")}
                 autoCapitalize="words" // Controls how the text input capitalizes letters automatically while typing
-                autoComplete="name"    // Helps the user type less by suggesting stored names
+                autoComplete="name" // Helps the user type less by suggesting stored names
               />
             </View>
 
@@ -207,7 +209,7 @@ const RegisterScreen = () => {
                   focusedInput === "email" && styles.inputFocused,
                 ]}
                 placeholder="Email"
-                placeholderTextColor="#626262"
+                placeholderTextColor="#000"
                 value={formData.email}
                 onChangeText={(value) => handleInputChange("email", value)}
                 onFocus={() => setFocusedInput("email")}
@@ -227,8 +229,8 @@ const RegisterScreen = () => {
                     focusedInput === "password" && styles.inputFocused,
                     styles.passwordInput,
                   ]}
-                  placeholder="Password (min: 8 Characterss)"
-                  placeholderTextColor="#626262"
+                  placeholder="Password (min: 8 Characters)"
+                  placeholderTextColor="#000"
                   value={formData.password}
                   onChangeText={(value) => handleInputChange("password", value)}
                   onFocus={() => setFocusedInput("password")}
@@ -243,7 +245,7 @@ const RegisterScreen = () => {
                   <Ionicons
                     name={showPassword ? "eye-off" : "eye"}
                     size={width * 0.06}
-                    color="#626262"
+                    color="#800e13"
                   />
                 </TouchableOpacity>
               </View>
@@ -259,7 +261,7 @@ const RegisterScreen = () => {
                     styles.passwordInput,
                   ]}
                   placeholder="Confirm Password"
-                  placeholderTextColor="#626262"
+                  placeholderTextColor="#000"
                   value={formData.repeatPassword}
                   onChangeText={(value) =>
                     handleInputChange("repeatPassword", value)
@@ -275,7 +277,7 @@ const RegisterScreen = () => {
                   <Ionicons
                     name={showConfirmPassword ? "eye-off" : "eye"}
                     size={width * 0.06}
-                    color="#626262"
+                    color="#800e13"
                   />
                 </TouchableOpacity>
               </View>
@@ -290,7 +292,7 @@ const RegisterScreen = () => {
                 <Ionicons
                   name={isAdmin ? "checkbox" : "square-outline"}
                   size={width * 0.06}
-                  color={isAdmin ? "#1F41BB" : "#626262"}
+                  color={isAdmin ? "#800e13" : "#000"}
                 />
               </TouchableOpacity>
               <Text style={styles.checkboxLabel}>I&apos;m an admin</Text>
@@ -302,8 +304,34 @@ const RegisterScreen = () => {
               onPress={handleRegister}
               activeOpacity={0.8}
             >
-              <Text style={styles.signInButtonText}>Register</Text>
+              <Text style={styles.signInButtonText}>Sign Up</Text>
             </TouchableOpacity>
+
+            {/* Or Sign In with Google or facebook section */}
+            <View>
+              <View style={styles.orContainer}>
+                <View style={styles.line} />
+                <Text style={styles.text}>Or</Text>
+                <View style={styles.line} />
+              </View>
+            </View>
+
+            <View style={styles.outsideIcons}>
+              <TouchableOpacity style={styles.outsideIcon} activeOpacity={0.7}>
+                <Ionicons
+                  name="logo-google"
+                  size={width * 0.11}
+                  color="#800e13"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.outsideIcon} activeOpacity={0.7}>
+                <Ionicons
+                  name="logo-facebook"
+                  size={width * 0.11}
+                  color="#800e13"
+                />
+              </TouchableOpacity>
+            </View>
 
             {/* Go to Login */}
             <TouchableOpacity
@@ -311,7 +339,8 @@ const RegisterScreen = () => {
               onPress={goToLogin}
             >
               <Text style={styles.createAccountText}>
-                Already have an account ? Login
+                Already have an account?{" "}
+                <Text style={styles.createAccountTextLink}>Sign In</Text>
               </Text>
             </TouchableOpacity>
           </View>
@@ -324,43 +353,44 @@ const RegisterScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#FFFFFF", 
+    backgroundColor: "#f6ededff",
   },
 
   // ScrollView for scrolling
   scrollContainer: {
-    flexGrow: 1, // Expand to take up all remaining space if possible
+    flexGrow: 1,                    // Expand to take up all remaining space if possible
+    paddingVertical: height * 0.05, // Adds space inside the scrollable area
   },
 
   // Header Section
   headerSection: {
-    height: height * 0.3, // 30% of the window height
     justifyContent: "center",
     alignItems: "center",
-    paddingHorizontal: width * 0.05
+    paddingHorizontal: width * 0.05,
   },
 
   // Title: "Join ChebebTN"
   mainTitle: {
     fontSize: width * 0.08,
-    fontWeight: "bold",
-    color: "#1F41BB",
-    marginBottom: height * 0.03, 
+    fontFamily: "DosisExtraBold",
+    color: "#640d14",
+    marginBottom: height * 0.02,
+    marginTop:10,
     textAlign: "center",
   },
 
   // "Create Your Account" message
   welcomeText: {
-    fontSize: width * 0.05, 
+    fontSize: width * 0.06,
+    fontFamily: "DosisRegular",
     color: "#000000",
     textAlign: "center",
     lineHeight: height * 0.04,
-    fontWeight: "500",
+    marginBottom: height * 0.02,
   },
 
   // Form Section
   formSection: {
-    height: height * 0.6, 
     paddingHorizontal: width * 0.08,
   },
 
@@ -371,15 +401,16 @@ const styles = StyleSheet.create({
 
   // TextInputs
   input: {
-    height: height * 0.08, 
-    width: width * 0.84, 
-    backgroundColor: "#F1F4FF",
-    borderRadius: width * 0.025, 
-    paddingHorizontal: width * 0.05, 
-    fontSize: width * 0.04,
+    height: height * 0.08,
+    width: width * 0.84,
+    backgroundColor: "#f7dedfc7",
+    borderRadius: width * 0.025,
+    paddingHorizontal: width * 0.05,
+    fontFamily: "DosisMedium",
+    fontSize: width * 0.045,
     color: "black",
-    borderWidth: 1, 
-    borderColor: "#1F41BB",
+    borderWidth: 1,
+    borderColor: "#800e13",
   },
 
   // When Input is focused on
@@ -412,13 +443,13 @@ const styles = StyleSheet.create({
   // Register Button
   signInButton: {
     height: height * 0.075,
-    width: width * 0.84, 
-    backgroundColor: "#1F41BB", 
-    borderRadius: width * 0.025, 
+    width: width * 0.84,
+    backgroundColor: "#800e13",
+    borderRadius: width * 0.025,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: height * 0.04,
-    shadowColor: "#1F41BB",
+    shadowColor: "#800e13",
     shadowOffset: {
       width: 0,
       height: height * 0.005, // Shadow Height
@@ -431,30 +462,36 @@ const styles = StyleSheet.create({
   // Register Text
   signInButtonText: {
     color: "#FFFFFF",
-    fontSize: width * 0.05, 
-    fontWeight: "bold",
+    fontSize: width * 0.06,
+    fontFamily: "DosisBold",
   },
 
   // Container for the link "Already have an account ? Login"
   createAccountContainer: {
     alignItems: "center",
-    marginTop: height * 0.01, // 1.5% de la hauteur pour l'espacement
+    marginTop: height * 0.01,
   },
 
   // Link to the Login Page
   createAccountText: {
-    fontSize: width * 0.035, 
+    fontSize: width * 0.038,
     color: "#494949",
-    fontWeight: "400",
+    fontFamily: "DosisMedium",
   },
-  // Container pour le checkbox
+
+  createAccountTextLink: {
+    fontSize: width * 0.04,
+    color: "#800e13",
+    fontFamily: "DosisBold",
+  },
+
+  // Container for the checkbox
   checkboxContainer: {
     flexDirection: "row",
     alignItems: "center",
     marginBottom: height * 0.03,
   },
 
-  // Style pour le checkbox personnalisé
   checkbox: {
     width: width * 0.06,
     height: width * 0.06,
@@ -462,11 +499,40 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
 
-  // Style pour le label du checkbox
+  // Checkbox Label
   checkboxLabel: {
-    fontSize: width * 0.04,
+    fontFamily: "DosisRegular",
+    fontSize: width * 0.05,
     color: "black",
     marginLeft: width * 0.02,
+  },
+
+  // Or sign Up with Google or facebook section 
+  orContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#640d14",
+  },
+  text: {
+    marginHorizontal: 10,
+    fontSize: 20,
+    fontFamily: "DosisBold",
+    color: "#800e13",
+  },
+  outsideIcons: {
+    marginTop: 10,
+    marginBottom: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  outsideIcon: {
+    marginHorizontal: 15,
   },
 });
 
