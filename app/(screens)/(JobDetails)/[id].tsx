@@ -48,7 +48,7 @@ const JobDetails: React.FC = () => {
       } catch (error) {
         const err = error as AxiosError<{ message?: string }>;
         Alert.alert(
-          "Erreur",
+          "Error",
           err.response?.data?.message || "Unable to show Job details!"
         );
       }
@@ -71,7 +71,7 @@ const JobDetails: React.FC = () => {
   if (!job) {
     return (
       <View style={styles.container}>
-        <Text style={styles.loadingText}>Loading...</Text>
+        <Text style={styles.loadingText}>Loading Job...</Text>
       </View>
     );
   }
@@ -84,7 +84,7 @@ const JobDetails: React.FC = () => {
           style={styles.backButton}
           onPress={() => router.back()}
         >
-          <Ionicons name="arrow-back" size={24} color="white" />
+          <Ionicons name="arrow-back" size={25} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>{job.title}</Text>
       </View>
@@ -97,41 +97,45 @@ const JobDetails: React.FC = () => {
 
           <View style={styles.jobDetails}>
             <View style={styles.detailRow}>
-              <Ionicons name="location-outline" size={16} color="#666" />
+              <Ionicons name="location-outline" size={18} color="#640d14" />
               <Text style={styles.detailText}>{job.location}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Ionicons name="time-outline" size={16} color="#666" />
+              <Ionicons name="time-outline" size={18} color="#640d14" />
               <Text style={styles.detailText}>{job.jobType}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Ionicons name="cash-outline" size={16} color="#666" />
+              <Ionicons name="cash-outline" size={18} color="#640d14" />
               <Text style={styles.detailText}>{formatSalary(job.salary)}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Ionicons name="briefcase-outline" size={16} color="#666" />
+              <Ionicons name="briefcase-outline" size={18} color="#640d14" />
               <Text style={styles.detailText}>{job.experienceLevel}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Ionicons name="calendar-outline" size={16} color="#666" />
+              <Ionicons name="calendar-outline" size={18} color="#640d14" />
               <Text style={styles.detailText}>
                 Deadline: {formatDate(job.applicationDeadline)}
               </Text>
             </View>
             <View style={styles.detailRow}>
-              <Ionicons name="document-text-outline" size={16} color="#666" />
+              <Ionicons
+                name="document-text-outline"
+                size={18}
+                color="#640d14"
+              />
               <Text style={styles.detailText}>Status: {job.status}</Text>
             </View>
             <View style={styles.detailRow}>
-              <Ionicons name="time-outline" size={16} color="#666" />
+              <Ionicons name="time-outline" size={18} color="#640d14" />
               <Text style={styles.detailText}>
-                Date of creation: {formatDate(job.createdAt)}
+                Date of Creation: {formatDate(job.createdAt)}
               </Text>
             </View>
             <View style={styles.detailRow}>
-              <Ionicons name="time-outline" size={16} color="#666" />
+              <Ionicons name="time-outline" size={18} color="#640d14" />
               <Text style={styles.detailText}>
-                Last Date of modification: {formatDate(job.updatedAt)}
+                Last Date of Modification: {formatDate(job.updatedAt)}
               </Text>
             </View>
           </View>
@@ -153,7 +157,7 @@ const JobDetails: React.FC = () => {
               job.applications.map((application, index) => (
                 <View key={application._id} style={styles.applicationItem}>
                   <Text style={styles.detailText}>
-                    User: {application.userId}
+                    Email: {application.userId}
                   </Text>
                   <Text style={styles.detailText}>
                     Application Date: {formatDate(application.appliedAt)}
@@ -175,13 +179,13 @@ const JobDetails: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#f6ededff",
   },
   header: {
     paddingTop: height * 0.06,
     paddingHorizontal: width * 0.05,
     paddingBottom: height * 0.025,
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
     flexDirection: "row",
     alignItems: "center",
   },
@@ -192,8 +196,8 @@ const styles = StyleSheet.create({
   },
 
   headerTitle: {
-    fontSize: width * 0.06,
-    fontWeight: "bold",
+    fontSize: width * 0.065,
+    fontFamily: "DosisBold",
     color: "white",
     textAlign: "center",
     flex: 1,
@@ -206,22 +210,23 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: width * 0.04,
     padding: width * 0.05,
-    marginTop: height * 0.02,
+    marginTop: height * 0.05,
     elevation: 3,
-    shadowColor: "#1F41BB",
+    shadowColor: "#800e13",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
   company: {
-    fontSize: width * 0.035,
-    color: "#1F41BB",
-    fontWeight: "500",
+    fontSize: width * 0.06,
+    fontFamily: "DosisBold",
+    color: "#800e13",
     marginBottom: height * 0.015,
   },
   description: {
-    fontSize: width * 0.035,
-    color: "#666",
+    fontSize: width * 0.045,
+    fontFamily: "DosisMedium",
+    color: "#000",
     marginBottom: height * 0.02,
     lineHeight: height * 0.025,
   },
@@ -234,7 +239,8 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.01,
   },
   detailText: {
-    fontSize: width * 0.035,
+    fontSize: width * 0.042,
+    fontFamily: "DosisMedium",
     color: "#333",
     marginLeft: width * 0.02,
   },
@@ -242,35 +248,38 @@ const styles = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   sectionTitle: {
-    fontSize: width * 0.04,
-    fontWeight: "600",
-    color: "#333",
+    fontSize: width * 0.05,
+    fontFamily: "DosisBold",
+    color: "#640d14",
     marginBottom: height * 0.01,
   },
   skillTag: {
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#f7dedfff",
     paddingHorizontal: width * 0.03,
     paddingVertical: height * 0.008,
-    borderRadius: width * 0.05,
+    borderRadius: width * 0.06,
+    borderWidth:1,
+    borderColor:"#800e13",
     marginRight: width * 0.02,
     marginBottom: height * 0.01,
   },
   skillText: {
-    fontSize: width * 0.03,
-    color: "#333",
-    fontWeight: "500",
+    fontSize: width * 0.035,
+    fontFamily: "DosisMedium",
+    color: "#800e13",
   },
   applicationsContainer: {
     marginBottom: height * 0.02,
   },
   applicationItem: {
     borderBottomWidth: 1,
-    borderBottomColor: "#f0f0f0",
-    paddingVertical: height * 0.01,
+    borderBottomColor: "#640d1496",
+    paddingVertical: height * 0.015,
   },
   loadingText: {
     fontSize: width * 0.04,
-    color: "#333",
+    fontFamily: "DosisBold",
+    color: "#800e13",
     textAlign: "center",
     marginTop: height * 0.1,
   },

@@ -12,6 +12,7 @@ import {
 import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router, useLocalSearchParams } from "expo-router";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width, height } = Dimensions.get("window");
 
@@ -62,7 +63,7 @@ const EditJob: React.FC = () => {
         const token = await AsyncStorage.getItem("token");
         if (!token) {
           Alert.alert("Error", "No Token found!");
-          router.push("/(screens)/home");
+          router.push("/(screens)/Home");
           return;
         }
 
@@ -82,7 +83,7 @@ const EditJob: React.FC = () => {
           salary: job.salary.toString(),
           jobType: job.jobType,
           experienceLevel: job.experienceLevel,
-          skills: job.skills.join(", "),
+          skills: job.skills.join(", "), // Array -> String
           applicationDeadline: job.applicationDeadline.split("T")[0], // Format YYYY-MM-DD
           status: job.status,
         });
@@ -93,14 +94,14 @@ const EditJob: React.FC = () => {
           "Error",
           err.response?.data?.message || "Unable to load the Job details!"
         );
-        router.push("/(screens)/home");
+        router.push("/(screens)/Home");
       }
     };
 
     fetchJob();
   }, [id]);
 
-  // Mange the form changes
+  // Manage the form changes
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
@@ -179,7 +180,7 @@ const EditJob: React.FC = () => {
       Alert.alert("Success", "Job Edited Successfully", [
         {
           text: "OK",
-          onPress: () => router.push("/(screens)/home"),
+          onPress: () => router.push("/(screens)/Home"),
         },
       ]);
     } catch (error) {
@@ -202,6 +203,12 @@ const EditJob: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={25} color="white" />
+        </TouchableOpacity>
         <Text style={styles.headerTitle}>Edit the Job</Text>
       </View>
 
@@ -211,14 +218,14 @@ const EditJob: React.FC = () => {
           placeholder="Title"
           value={formData.title}
           onChangeText={(text) => handleInputChange("title", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Company"
           value={formData.company}
           onChangeText={(text) => handleInputChange("company", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={[styles.input, styles.textArea]}
@@ -227,14 +234,14 @@ const EditJob: React.FC = () => {
           onChangeText={(text) => handleInputChange("description", text)}
           multiline
           numberOfLines={4}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Location"
           value={formData.location}
           onChangeText={(text) => handleInputChange("location", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
@@ -242,28 +249,28 @@ const EditJob: React.FC = () => {
           value={formData.salary}
           onChangeText={(text) => handleInputChange("salary", text)}
           keyboardType="numeric"
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Job Type (ex: Full-time)"
           value={formData.jobType}
           onChangeText={(text) => handleInputChange("jobType", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Level of Expertise (ex: Mid)"
           value={formData.experienceLevel}
           onChangeText={(text) => handleInputChange("experienceLevel", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Skills (',' Separated)"
           value={formData.skills}
           onChangeText={(text) => handleInputChange("skills", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
@@ -272,14 +279,14 @@ const EditJob: React.FC = () => {
           onChangeText={(text) =>
             handleInputChange("applicationDeadline", text)
           }
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Status (ex: Open)"
           value={formData.status}
           onChangeText={(text) => handleInputChange("status", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -293,33 +300,44 @@ const EditJob: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#ffffffd1",
   },
   header: {
     paddingTop: height * 0.06,
     paddingHorizontal: width * 0.05,
     paddingBottom: height * 0.025,
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
+    flexDirection: "row",
+    alignItems: "center",
   },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: height * 0.01,
+  },
+
   headerTitle: {
-    fontSize: width * 0.06,
-    fontWeight: "bold",
+    fontSize: width * 0.065,
+    fontFamily: "DosisBold",
     color: "white",
     textAlign: "center",
+    flex: 1,
   },
   formContainer: {
     paddingHorizontal: width * 0.05,
     paddingVertical: height * 0.02,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#f6ededff",
     borderRadius: width * 0.03,
+    borderWidth: 1,
+    borderColor: "#800e13",
     padding: width * 0.04,
     marginBottom: height * 0.02,
     fontSize: width * 0.04,
-    color: "#333",
+    color: "#000",
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: "#800e13",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -329,20 +347,24 @@ const styles = StyleSheet.create({
     textAlignVertical: "top",
   },
   submitButton: {
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
     paddingVertical: height * 0.015,
+    marginBottom: 10,
     borderRadius: width * 0.03,
     alignItems: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowColor: "#800e13",
+    shadowOffset: {
+      width: 0,
+      height: height * 0.005,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: width * 0.02,
+    elevation: 8,
   },
   submitButtonText: {
-    color: "white",
-    fontSize: width * 0.04,
-    fontWeight: "600",
+    color: "#FFFFFF",
+    fontSize: width * 0.05,
+    fontFamily: "DosisBold",
   },
 });
 

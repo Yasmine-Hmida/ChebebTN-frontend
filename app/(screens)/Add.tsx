@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Ionicons } from "@expo/vector-icons";
 import {
   Alert,
   Dimensions,
@@ -91,10 +92,10 @@ const AddJob: React.FC = () => {
           company: formData.company,
           description: formData.description,
           location: formData.location,
-          salary,
+          salary: salary,
           jobType: formData.jobType,
           experienceLevel: formData.experienceLevel,
-          skills,
+          skills: skills,
           applicationDeadline: formData.applicationDeadline,
           status: formData.status,
         },
@@ -106,7 +107,7 @@ const AddJob: React.FC = () => {
       Alert.alert("Success", "Job Added Successfully!", [
         {
           text: "OK",
-          onPress: () => router.push("/(screens)/home"),
+          onPress: () => router.push("/(screens)/Home"),
         },
       ]);
     } catch (error) {
@@ -121,7 +122,13 @@ const AddJob: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Add a new job</Text>
+        <TouchableOpacity
+          style={styles.backButton}
+          onPress={() => router.back()}
+        >
+          <Ionicons name="arrow-back" size={25} color="white" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Add a new Job</Text>
       </View>
 
       <View style={styles.formContainer}>
@@ -130,14 +137,14 @@ const AddJob: React.FC = () => {
           placeholder="Title"
           value={formData.title}
           onChangeText={(text) => handleInputChange("title", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Company"
           value={formData.company}
           onChangeText={(text) => handleInputChange("company", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={[styles.input, styles.textArea]}
@@ -146,14 +153,14 @@ const AddJob: React.FC = () => {
           onChangeText={(text) => handleInputChange("description", text)}
           multiline
           numberOfLines={4}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Location"
           value={formData.location}
           onChangeText={(text) => handleInputChange("location", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
@@ -161,28 +168,28 @@ const AddJob: React.FC = () => {
           value={formData.salary}
           onChangeText={(text) => handleInputChange("salary", text)}
           keyboardType="numeric"
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
-        <TextInput
+        <TextInput // Select Options
           style={styles.input}
           placeholder="Job type (ex: Full-time)"
           value={formData.jobType}
           onChangeText={(text) => handleInputChange("jobType", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
-        <TextInput
+        <TextInput // Select Options
           style={styles.input}
           placeholder="Level of Expertise (ex: Mid)"
           value={formData.experienceLevel}
           onChangeText={(text) => handleInputChange("experienceLevel", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
           placeholder="Skills (',' separated)"
           value={formData.skills}
           onChangeText={(text) => handleInputChange("skills", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
@@ -191,14 +198,14 @@ const AddJob: React.FC = () => {
           onChangeText={(text) =>
             handleInputChange("applicationDeadline", text)
           }
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
         <TextInput
           style={styles.input}
-          placeholder="Status (ex: Open)"
+          placeholder="Status (ex: Open)" // Select Options
           value={formData.status}
           onChangeText={(text) => handleInputChange("status", text)}
-          placeholderTextColor="#999"
+          placeholderTextColor="#333"
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
@@ -212,56 +219,76 @@ const AddJob: React.FC = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#ffffffd1",
   },
   header: {
     paddingTop: height * 0.06,
     paddingHorizontal: width * 0.05,
     paddingBottom: height * 0.025,
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
+    flexDirection: "row",
+    alignItems: "center",
   },
+  backButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: height * 0.01,
+  },
+
   headerTitle: {
-    fontSize: width * 0.06,
-    fontWeight: "bold",
+    fontSize: width * 0.065,
+    fontFamily: "DosisBold",
     color: "white",
     textAlign: "center",
+    flex: 1,
   },
   formContainer: {
     paddingHorizontal: width * 0.05,
     paddingVertical: height * 0.02,
   },
   input: {
-    backgroundColor: "white",
+    backgroundColor: "#f6ededff",
     borderRadius: width * 0.03,
+    borderWidth: 1,
+    borderColor: "#800e13",
     padding: width * 0.04,
     marginBottom: height * 0.02,
-    fontSize: width * 0.04,
-    color: "#333",
+    fontSize: width * 0.042,
+    fontFamily: "DosisMedium",
+    color: "#000",
     elevation: 2,
-    shadowColor: "#000",
+    shadowColor: "#800e13",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+  },
+  inputFocused: {
+    // use it lateer
+    borderWidth: 3,
   },
   textArea: {
     height: height * 0.15,
     textAlignVertical: "top",
   },
   submitButton: {
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
     paddingVertical: height * 0.015,
+    marginBottom: 10,
     borderRadius: width * 0.03,
     alignItems: "center",
-    elevation: 3,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowColor: "#800e13",
+    shadowOffset: {
+      width: 0,
+      height: height * 0.005,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: width * 0.02,
+    elevation: 8,
   },
   submitButtonText: {
-    color: "white",
-    fontSize: width * 0.04,
-    fontWeight: "600",
+    color: "#FFFFFF",
+    fontSize: width * 0.05,
+    fontFamily: "DosisBold",
   },
 });
 
