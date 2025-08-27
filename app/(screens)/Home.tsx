@@ -79,7 +79,7 @@ export default function Home() {
     return date.toLocaleDateString(); // 2025-07-27T09:37:27.495Z => 31/08/2025
   };
 
-  // Handle Action          -------------------------------------------------------------------------------------------------------
+  // Handle Action when clicking one of the modal options
   const handleAction = (action: string) => {
     setModalVisible(false); // Setting the modal invisible before navigating to the other page
     switch (action) {
@@ -105,10 +105,7 @@ export default function Home() {
                   try {
                     const token = await AsyncStorage.getItem("token");
                     if (!token) {
-                      Alert.alert(
-                        "Error",
-                        "Token not Found!"
-                      );
+                      Alert.alert("Error", "Token not Found!");
                       return;
                     }
                     await axios.delete(
@@ -124,8 +121,7 @@ export default function Home() {
                     const err = error as AxiosError<{ message?: string }>;
                     Alert.alert(
                       "Error",
-                      err.response?.data?.message ||
-                        "Unable to Delete the Job!"
+                      err.response?.data?.message || "Unable to Delete the Job!"
                     );
                   }
                 },
@@ -171,7 +167,7 @@ export default function Home() {
             setModalVisible(true);
           }}
         >
-          <Ionicons name="ellipsis-vertical" size={20} color="#666" />
+          <Ionicons name="ellipsis-vertical" size={20} color="#640d14" />
         </TouchableOpacity>
       </View>
 
@@ -179,17 +175,17 @@ export default function Home() {
 
       <View style={style.jobDetails}>
         <View style={style.detailRow}>
-          <Ionicons name="location-outline" size={16} color="#666" />
+          <Ionicons name="location-outline" size={16} color="#640d14" />
           <Text style={style.detailText}>{item.location}</Text>
         </View>
 
         <View style={style.detailRow}>
-          <Ionicons name="time-outline" size={16} color="#666" />
+          <Ionicons name="time-outline" size={16} color="#640d14" />
           <Text style={style.detailText}>{item.jobType}</Text>
         </View>
 
         <View style={style.detailRow}>
-          <Ionicons name="cash-outline" size={16} color="#666" />
+          <Ionicons name="cash-outline" size={16} color="#640d14" />
           <Text style={style.detailText}>{formatSalary(item.salary)}</Text>
         </View>
       </View>
@@ -216,10 +212,10 @@ export default function Home() {
       <View style={style.container}>
         {/* Header */}
         <View style={style.header}>
-          <Text style={style.headerTitle}>Jobs Available</Text>
           <TouchableOpacity style={style.logoutButton} onPress={handleLogout}>
-            <Ionicons name="log-out-outline" size={24} color="white" />
+            <Ionicons name="log-out-outline" size={28} color="#fff" />
           </TouchableOpacity>
+          <Text style={style.headerTitle}>Jobs Available</Text>
         </View>
 
         {/* Search Bar */}
@@ -228,13 +224,13 @@ export default function Home() {
             <Ionicons
               name="search"
               size={20}
-              color="#666"
+              color="#640d14"
               style={style.searchIcon}
             />
             <TextInput
               style={style.searchInput}
               placeholder="Search a job"
-              placeholderTextColor="#999"
+              placeholderTextColor="#333"
               value={searchText}
               onChangeText={setSearchText}
             />
@@ -247,7 +243,7 @@ export default function Home() {
             style={style.addButton}
             onPress={() => router.push("/(screens)/Add")}
           >
-            <Ionicons name="add" size={24} color="white" />
+            <Ionicons name="add" size={24} color="#fff" />
             <Text style={style.addButtonText}>Add a job</Text>
           </TouchableOpacity>
         )}
@@ -278,7 +274,7 @@ export default function Home() {
                 style={style.modalOption}
                 onPress={() => handleAction("view")}
               >
-                <Ionicons name="eye-outline" size={20} color="#333" />
+                <Ionicons name="eye-outline" size={20} color="#640d14" />
                 <Text style={style.modalOptionText}>View</Text>
               </TouchableOpacity>
 
@@ -287,7 +283,7 @@ export default function Home() {
                   style={style.modalOption}
                   onPress={() => handleAction("edit")}
                 >
-                  <Ionicons name="create-outline" size={20} color="#333" />
+                  <Ionicons name="create-outline" size={20} color="#640d14" />
                   <Text style={style.modalOptionText}>Edit</Text>
                 </TouchableOpacity>
               )}
@@ -297,8 +293,8 @@ export default function Home() {
                   style={style.modalOption}
                   onPress={() => handleAction("delete")}
                 >
-                  <Ionicons name="trash-outline" size={20} color="#e74c3c" />
-                  <Text style={[style.modalOptionText, { color: "#e74c3c" }]}>
+                  <Ionicons name="trash-outline" size={20} color="#800e13" />
+                  <Text style={[style.modalOptionText, { color: "#800e13" }]}>
                     Delete
                   </Text>
                 </TouchableOpacity>
@@ -314,24 +310,24 @@ export default function Home() {
 const style = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8f9fa",
+    backgroundColor: "#f6ededff",
   },
   header: {
     paddingTop: height * 0.06,
     paddingHorizontal: width * 0.05,
     paddingBottom: height * 0.025,
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
+    flexDirection: "row",
   },
   headerTitle: {
-    fontSize: width * 0.06,
-    fontWeight: "bold",
-    color: "white",
+    fontSize: width * 0.07,
+    fontFamily: "DosisBold",
+    color: "#fff",
     textAlign: "center",
+    marginLeft: 40,
   },
   logoutButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
     paddingVertical: height * 0.01,
     paddingHorizontal: width * 0.03,
     borderRadius: width * 0.03,
@@ -343,8 +339,10 @@ const style = StyleSheet.create({
   searchInputContainer: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "white",
+    backgroundColor: "#f7dedfff",
     borderRadius: width * 0.03,
+    borderWidth: 0.8,
+    borderColor: "#800e13",
     paddingHorizontal: width * 0.04,
     elevation: 2,
     shadowColor: "#000",
@@ -359,13 +357,14 @@ const style = StyleSheet.create({
     flex: 1,
     height: height * 0.06,
     fontSize: width * 0.04,
-    color: "#333",
+    fontFamily: "DosisMedium",
+    color: "#000",
   },
   addButton: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    backgroundColor: "#1F41BB",
+    backgroundColor: "#800e13",
     marginHorizontal: width * 0.05,
     marginBottom: height * 0.025,
     paddingVertical: height * 0.015,
@@ -378,8 +377,8 @@ const style = StyleSheet.create({
   },
   addButtonText: {
     color: "white",
-    fontSize: width * 0.04,
-    fontWeight: "600",
+    fontSize: width * 0.05,
+    fontFamily: "DosisBold",
     marginLeft: width * 0.02,
   },
   listContainer: {
@@ -387,13 +386,13 @@ const style = StyleSheet.create({
     paddingBottom: height * 0.025,
   },
   jobCard: {
-    backgroundColor: "white",
+    backgroundColor: "#fff",
     borderRadius: width * 0.04,
     padding: width * 0.05,
     marginBottom: height * 0.02,
     elevation: 3,
-    shadowColor: "#1F41BB",
-    shadowOffset: { width: 0, height: 2 },
+    shadowColor: "#800e13",
+    shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
   },
@@ -407,21 +406,22 @@ const style = StyleSheet.create({
     flex: 1,
   },
   jobTitle: {
-    fontSize: width * 0.045,
-    fontWeight: "bold",
+    fontSize: width * 0.05,
+    fontFamily: "DosisBold",
     color: "#333",
     marginBottom: height * 0.005,
   },
   company: {
-    fontSize: width * 0.035,
-    color: "#1F41BB",
-    fontWeight: "500",
+    fontSize: width * 0.04,
+    fontFamily: "DosisBold",
+    color: "#800e13",
   },
   menuButton: {
     padding: width * 0.01,
   },
   description: {
-    fontSize: width * 0.035,
+    fontSize: width * 0.04,
+    fontFamily: "DosisMedium",
     color: "#666",
     marginBottom: height * 0.02,
     lineHeight: height * 0.025,
@@ -436,6 +436,7 @@ const style = StyleSheet.create({
   },
   detailText: {
     fontSize: width * 0.035,
+    fontFamily: "DosisMedium",
     color: "#333",
     marginLeft: width * 0.02,
   },
@@ -445,17 +446,19 @@ const style = StyleSheet.create({
     marginBottom: height * 0.02,
   },
   skillTag: {
-    backgroundColor: "#bcc5e7ff",
+    backgroundColor: "#f7dedfc7",
     paddingHorizontal: width * 0.03,
     paddingVertical: height * 0.008,
     borderRadius: width * 0.05,
+    borderWidth: 1,
+    borderColor: "#800e13",
     marginRight: width * 0.02,
     marginBottom: height * 0.01,
   },
   skillText: {
-    fontSize: width * 0.03,
-    color: "#333",
-    fontWeight: "500",
+    fontSize: width * 0.032,
+    fontFamily: "DosisBold",
+    color: "#800e13",
   },
   cardFooter: {
     flexDirection: "row",
@@ -463,19 +466,22 @@ const style = StyleSheet.create({
     alignItems: "center",
     paddingTop: height * 0.02,
     borderTopWidth: 1,
-    borderTopColor: "#f0f0f0",
+    borderTopColor: "#640d1496",
   },
   experienceLevel: {
     fontSize: width * 0.03,
-    color: "#1F41BB",
-    fontWeight: "600",
-    backgroundColor: "#f0f4ff",
+    fontFamily: "DosisBold",
+    color: "#800e13",
+    backgroundColor: "#f7dedfc7",
     paddingHorizontal: width * 0.02,
     paddingVertical: height * 0.005,
     borderRadius: width * 0.03,
+    borderWidth: 1,
+    borderColor: "#800e13"
   },
   deadline: {
-    fontSize: width * 0.03,
+    fontSize: width * 0.035,
+    fontFamily: "DosisMedium",
     color: "#666",
   },
   modalOverlay: {
@@ -502,7 +508,8 @@ const style = StyleSheet.create({
     paddingHorizontal: width * 0.04,
   },
   modalOptionText: {
-    fontSize: width * 0.04,
+    fontSize: width * 0.043,
+    fontFamily: "DosisMedium",
     color: "#333",
     marginLeft: width * 0.03,
   },
