@@ -70,7 +70,7 @@ export default function LoginScreen() {
       console.log("Login Error: ", err);
 
       // We do this checking here because axios goes to this catch bloc if the res'status is not 200 or 201
-      if (err.response && err.response.status === 400) {
+      if (err.response && err.response.status < 500) {
         Alert.alert("Error", "Email or Password Incorrect!");
       } else {
         Alert.alert("Error", "Login Failed due to a Network or Server error!");
