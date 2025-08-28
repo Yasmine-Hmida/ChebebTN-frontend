@@ -13,6 +13,7 @@ import {
 import axios, { AxiosError } from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { router } from "expo-router";
+import { Dropdown } from "react-native-element-dropdown";
 
 const { width, height } = Dimensions.get("window");
 
@@ -29,6 +30,28 @@ const AddJob: React.FC = () => {
     applicationDeadline: "",
     status: "Open",
   });
+  const [focusedInput, setFocusedInput] = useState("");
+
+  // Levels of Expertise allowed
+  const levels = [
+    { label: "Entry", value: "Entry" },
+    { label: "Mid", value: "Mid" },
+    { label: "Senior", value: "Senior" },
+  ];
+
+  // Job Types allowed
+  const jobTypes = [
+    { label: "Full-time", value: "Full-time" },
+    { label: "Part-time", value: "Part-time" },
+    { label: "Contract", value: "Contract" },
+    { label: "Internship", value: "Internship" },
+  ];
+
+  // Statuses allowed
+  const status = [
+    { label: "Open", value: "Open" },
+    { label: "Closed", value: "Closed" },
+  ];
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -133,79 +156,187 @@ const AddJob: React.FC = () => {
 
       <View style={styles.formContainer}>
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === "title" && styles.inputFocused,
+          ]}
           placeholder="Title"
           value={formData.title}
           onChangeText={(text) => handleInputChange("title", text)}
           placeholderTextColor="#333"
+          onFocus={() => setFocusedInput("title")}
+          onBlur={() => setFocusedInput("")}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === "company" && styles.inputFocused,
+          ]}
           placeholder="Company"
           value={formData.company}
           onChangeText={(text) => handleInputChange("company", text)}
           placeholderTextColor="#333"
+          onFocus={() => setFocusedInput("company")}
+          onBlur={() => setFocusedInput("")}
         />
         <TextInput
-          style={[styles.input, styles.textArea]}
+          style={[styles.input, styles.textArea , focusedInput === "description" && styles.inputFocused,]}
           placeholder="Description"
           value={formData.description}
           onChangeText={(text) => handleInputChange("description", text)}
           multiline
           numberOfLines={4}
           placeholderTextColor="#333"
+          onFocus={() => setFocusedInput("description")}
+          onBlur={() => setFocusedInput("")}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === "location" && styles.inputFocused,
+          ]}
           placeholder="Location"
           value={formData.location}
           onChangeText={(text) => handleInputChange("location", text)}
           placeholderTextColor="#333"
+          onFocus={() => setFocusedInput("location")}
+          onBlur={() => setFocusedInput("")}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === "salary" && styles.inputFocused,
+          ]}
           placeholder="Salary"
           value={formData.salary}
           onChangeText={(text) => handleInputChange("salary", text)}
           keyboardType="numeric"
           placeholderTextColor="#333"
+          onFocus={() => setFocusedInput("salary")}
+          onBlur={() => setFocusedInput("")}
         />
-        <TextInput // Select Options
-          style={styles.input}
-          placeholder="Job type (ex: Full-time)"
+
+        {/* Job Type Dropdown */}
+        <Dropdown
+          style={[
+            styles.input,
+            focusedInput === "jobType" && styles.inputFocused,
+          ]}
+          data={jobTypes}
+          labelField="label"
+          valueField="value"
+          placeholder="Job Type"
+          placeholderStyle={{
+            color: "#000",
+            fontSize: width * 0.045,
+            fontFamily: "DosisMedium",
+          }}
+          containerStyle={[styles.input, { borderRadius: width * 0.02 }]}
+          selectedTextStyle={{
+            color: "#000",
+            fontFamily: "DosisMedium",
+            fontSize: width * 0.042,
+          }}
+          itemTextStyle={{
+            color: "#800e13",
+            fontSize: width * 0.045,
+            fontFamily: "DosisBold",
+          }} // Dropdown Items
           value={formData.jobType}
-          onChangeText={(text) => handleInputChange("jobType", text)}
-          placeholderTextColor="#333"
+          onChange={(item) => handleInputChange("jobType", item.value)}
+          onFocus={() => setFocusedInput("jobType")}
+          onBlur={() => setFocusedInput("")}
         />
-        <TextInput // Select Options
-          style={styles.input}
-          placeholder="Level of Expertise (ex: Mid)"
+
+        {/* Level of Expertise Dropdown */}
+        <Dropdown
+          style={[
+            styles.input,
+            focusedInput === "levelExpertise" && styles.inputFocused,
+          ]}
+          data={levels}
+          labelField="label"
+          valueField="value"
+          placeholder="Level of Expertise"
+          placeholderStyle={{
+            color: "#000",
+            fontSize: width * 0.045,
+            fontFamily: "DosisMedium",
+          }}
+          containerStyle={[styles.input, { borderRadius: width * 0.02 }]}
+          selectedTextStyle={{
+            color: "#000",
+            fontFamily: "DosisMedium",
+            fontSize: width * 0.042,
+          }}
+          itemTextStyle={{
+            color: "#800e13",
+            fontSize: width * 0.045,
+            fontFamily: "DosisBold",
+          }} // Dropdown Items
           value={formData.experienceLevel}
-          onChangeText={(text) => handleInputChange("experienceLevel", text)}
-          placeholderTextColor="#333"
+          onChange={(item) => handleInputChange("experienceLevel", item.value)}
+          onFocus={() => setFocusedInput("levelExpertise")}
+          onBlur={() => setFocusedInput("")}
         />
+
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === "skills" && styles.inputFocused,
+          ]}
           placeholder="Skills (',' separated)"
           value={formData.skills}
           onChangeText={(text) => handleInputChange("skills", text)}
           placeholderTextColor="#333"
+          onFocus={() => setFocusedInput("skills")}
+          onBlur={() => setFocusedInput("")}
         />
         <TextInput
-          style={styles.input}
+          style={[
+            styles.input,
+            focusedInput === "deadline" && styles.inputFocused,
+          ]}
           placeholder="Deadline (YYYY-MM-DD)"
           value={formData.applicationDeadline}
           onChangeText={(text) =>
             handleInputChange("applicationDeadline", text)
           }
           placeholderTextColor="#333"
+          onFocus={() => setFocusedInput("deadline")}
+          onBlur={() => setFocusedInput("")}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Status (ex: Open)" // Select Options
+
+        {/* Status Dropdown */}
+        <Dropdown
+          style={[
+            styles.input,
+            focusedInput === "status" && styles.inputFocused,
+          ]}
+          data={status}
+          labelField="label"
+          valueField="value"
+          placeholder="Status"
+          placeholderStyle={{
+            color: "#000",
+            fontSize: width * 0.045,
+            fontFamily: "DosisMedium",
+          }}
+          containerStyle={[styles.input, { borderRadius: width * 0.02 }]}
+          selectedTextStyle={{
+            color: "#000",
+            fontFamily: "DosisMedium",
+            fontSize: width * 0.042,
+          }}
+          itemTextStyle={{
+            color: "#800e13",
+            fontSize: width * 0.045,
+            fontFamily: "DosisBold",
+          }} // Dropdown Items
           value={formData.status}
-          onChangeText={(text) => handleInputChange("status", text)}
-          placeholderTextColor="#333"
+          onChange={(item) => handleInputChange("status", item.value)}
+          onFocus={() => setFocusedInput("status")}
+          onBlur={() => setFocusedInput("")}
         />
 
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
