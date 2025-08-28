@@ -394,7 +394,6 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
   },
   inputFocused: {
-    // use it lateer
     borderWidth: 3,
   },
   textArea: {

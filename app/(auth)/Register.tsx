@@ -115,7 +115,7 @@ const RegisterScreen = () => {
         email: formData.email,
         password: formData.password,
         repeatPassword: formData.repeatPassword,
-        role: isAdmin ? "Admin" : "Job Seeker",
+        role: isAdmin ? "Admin" : "JobSeeker",
       });
 
       if (response.status === 201) {

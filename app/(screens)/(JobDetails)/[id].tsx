@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { Ionicons } from "@expo/vector-icons";
 import React, { useState, useEffect } from "react";
 import {
@@ -11,6 +12,7 @@ import {
 } from "react-native";
 import axios, { AxiosError } from "axios";
 import { router, useLocalSearchParams } from "expo-router";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const { width, height } = Dimensions.get("window");
 
@@ -35,29 +37,48 @@ interface Job {
 
 const JobDetails: React.FC = () => {
   const [job, setJob] = useState<Job | null>(null);
+  const [isJobSeeker, setIsJobSeeker] = useState(false);
+  const [userEmails, setUserEmails] = useState<string[]>([]); // Array of Emails of the jobSeekers that applied for the job
 
   // Retrieve the job ID from URL parameters
   const { id } = useLocalSearchParams();
 
+  const fetchJob = async () => {
+    try {
+      const response = await axios.get(`http://10.0.2.2:3000/api/jobs/${id}`);
+      setJob(response.data);
+
+      // fetch emails for each application
+      const emails = await Promise.all(  // Promise.all waits for all of the email fetching for each app to finish and then gives us back an array of all results
+        response.data.applications.map(async (app: any) => {
+          try {
+            const res = await axios.get(
+              `http://10.0.2.2:3000/api/user/${app.userId}`
+            );
+            return res.data.email;
+          } 
+          catch {
+            return "Unknown Email";
+          }
+        })
+      );
+      setUserEmails(emails);
+
+      const role = await AsyncStorage.getItem("role");
+      setIsJobSeeker(role === "JobSeeker");
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      Alert.alert(
+        "Error",
+        err.response?.data?.message || "Unable to show Job details!"
+      );
+    }
+  };
+
   // Fetch job details from backend on component mount
   useEffect(() => {
-    const fetchJob = async () => {
-      try {
-        const response = await axios.get(`http://10.0.2.2:3000/api/jobs/${id}`);
-        setJob(response.data);
-      } catch (error) {
-        const err = error as AxiosError<{ message?: string }>;
-        Alert.alert(
-          "Error",
-          err.response?.data?.message || "Unable to show Job details!"
-        );
-      }
-    };
-
-    if (id) {
-      fetchJob();
-    }
-  }, [id]); // Changes each time the id changes
+    if (id) fetchJob();
+  }, [id]);
 
   const formatSalary = (salary: number): string => {
     return `$${salary.toLocaleString()}`;
@@ -66,6 +87,80 @@ const JobDetails: React.FC = () => {
   const formatDate = (dateString: string): string => {
     const date = new Date(dateString);
     return date.toLocaleDateString();
+  };
+
+  const fetchUserEmail = async () => {
+    try {
+      // Get the UserId from the AsyncStorage
+      const userId = await AsyncStorage.getItem("userId");
+      if (!userId) {
+        Alert.alert("Error", "User not Found!");
+        return;
+      }
+
+      // Get the User Email
+      const response = await axios.get(
+        `http://10.0.2.2:3000/api/user/${userId}`
+      );
+
+      return response.data.email;
+    } catch (error) {
+      const err = error as AxiosError<{ message?: string }>;
+      Alert.alert(
+        "Error",
+        err.response?.data?.message || "Could not retrieve the User Email!"
+      );
+      return;
+    }
+  };
+
+  const applyForJob = async () => {
+    try {
+      // Get the User Token
+      const token = await AsyncStorage.getItem("token");
+      if (!token) {
+        Alert.alert("Error", "Token not Found!");
+        return;
+      }
+
+      // Get the User Email
+      const userEmail = await fetchUserEmail();
+      if (!userEmail) {
+        Alert.alert("Error", "User Email not Found!");
+        return;
+      }
+
+      // Check if the User Already applied for the Job
+      const existingApplication = userEmails.some((uEmail) => uEmail === userEmail);
+      if(existingApplication){
+        Alert.alert("Error", "You already Applied for the Job!");
+        return;
+      }
+
+      // Add it to the User Emails of who applied to the Job
+      setUserEmails((prev) => [...prev, userEmail]);
+
+      // Apply for the Job
+      const response = await axios.post(
+        `http://10.0.2.2:3000/api/jobs/${id}/apply`,
+        {
+          email: userEmail,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      if (response.status === 200) {
+        Alert.alert("Success", "You Applied to the Job Successfully!");
+
+        // Refresh the Page
+        await fetchJob();
+      }
+    } catch (err: any) {
+      console.log(err);
+      Alert.alert("Error", "Could Not Pursue Application!");
+    }
   };
 
   if (!job) {
@@ -157,7 +252,7 @@ const JobDetails: React.FC = () => {
               job.applications.map((application, index) => (
                 <View key={application._id} style={styles.applicationItem}>
                   <Text style={styles.detailText}>
-                    Email: {application.userId}
+                    Email: {userEmails[index]}
                   </Text>
                   <Text style={styles.detailText}>
                     Application Date: {formatDate(application.appliedAt)}
@@ -171,6 +266,13 @@ const JobDetails: React.FC = () => {
             )}
           </View>
         </View>
+
+        {/* Apply for the Job Button only visible for Job Seekers */}
+        {isJobSeeker && (
+          <TouchableOpacity style={styles.submitButton} onPress={applyForJob}>
+            <Text style={styles.submitButtonText}>Apply for the Job</Text>
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </View>
   );
@@ -210,7 +312,7 @@ const styles = StyleSheet.create({
     backgroundColor: "white",
     borderRadius: width * 0.04,
     padding: width * 0.05,
-    marginTop: height * 0.05,
+    marginTop: height * 0.045,
     borderWidth: 1,
     borderColor: "#800e13",
     elevation: 3,
@@ -260,8 +362,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: width * 0.03,
     paddingVertical: height * 0.008,
     borderRadius: width * 0.06,
-    borderWidth:1,
-    borderColor:"#800e13",
+    borderWidth: 1,
+    borderColor: "#800e13",
     marginRight: width * 0.02,
     marginBottom: height * 0.01,
   },
@@ -284,6 +386,26 @@ const styles = StyleSheet.create({
     color: "#800e13",
     textAlign: "center",
     marginTop: height * 0.1,
+  },
+  submitButton: {
+    backgroundColor: "#800e13",
+    paddingVertical: height * 0.015,
+    marginVertical: 15,
+    borderRadius: width * 0.03,
+    alignItems: "center",
+    shadowColor: "#800e13",
+    shadowOffset: {
+      width: 0,
+      height: height * 0.005,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: width * 0.02,
+    elevation: 8,
+  },
+  submitButtonText: {
+    color: "#FFFFFF",
+    fontSize: width * 0.05,
+    fontFamily: "DosisBold",
   },
 });
 

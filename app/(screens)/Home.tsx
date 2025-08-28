@@ -249,13 +249,19 @@ export default function Home() {
         )}
 
         {/* List of jobs */}
-        <FlatList
-          data={jobs}
-          keyExtractor={(item) => item._id.toString()}
-          renderItem={({ item }) => <JobCard item={item} />} // How to display each item
-          contentContainerStyle={style.listContainer} // Style the content
-          showsVerticalScrollIndicator={false} // Hide the scrollBar
-        />
+        {jobs.length > 0 ? (
+          <FlatList
+            data={jobs}
+            keyExtractor={(item) => item._id.toString()}
+            renderItem={({ item }) => <JobCard item={item} />} // How to display each item
+            contentContainerStyle={style.listContainer} // Style the content
+            showsVerticalScrollIndicator={false} // Hide the scrollBar
+          />
+        ) : (
+          <View style={style.noJobContainer}>
+            <Text style={style.noJobText}>No Jobs on the Platform So far!</Text>
+          </View>
+        )}
 
         {/* Modal */}
         <Modal
@@ -477,7 +483,7 @@ const style = StyleSheet.create({
     paddingVertical: height * 0.005,
     borderRadius: width * 0.03,
     borderWidth: 1,
-    borderColor: "#800e13"
+    borderColor: "#800e13",
   },
   deadline: {
     fontSize: width * 0.035,
@@ -512,5 +518,16 @@ const style = StyleSheet.create({
     fontFamily: "DosisMedium",
     color: "#333",
     marginLeft: width * 0.03,
+  },
+  noJobContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 20,
+  },
+  noJobText: {
+    textAlign: "center",
+    fontFamily: "DosisBold",
+    fontSize: width * 0.055,
+    color: "#800e13",
   },
 });

@@ -1,6 +1,13 @@
 import React, { useEffect } from "react";
 import { router } from "expo-router"; /* For navigation */
-import { StyleSheet, View, ActivityIndicator, Text } from "react-native";
+import {
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  Text,
+  Dimensions,
+} from "react-native";
+const { height, width } = Dimensions.get("window"); // For a responsive styling based on the window dimensions
 
 export default function Index() {
   useEffect(() => {
@@ -13,8 +20,7 @@ export default function Index() {
 
   return (
     <View style={style.container}>
-      <Text style={style.title}>Welcome to ChebebTN</Text>
-      <Text style={style.subtitle}>App Loading...</Text>
+      <Text style={style.title}>ChebebTN</Text>
       <ActivityIndicator size="large" color="#800e13" style={style.loader} />
     </View>
   );
@@ -28,18 +34,13 @@ const style = StyleSheet.create({
     alignItems: "center",
   },
   title: {
-    fontSize: 24,
-    fontWeight: "bold",
+    fontFamily: "DosisExtraBold",
+    fontSize: width * 0.08,
     color: "#640d14",
-    textAlign: "center",
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#000000",
-    marginBottom: 10,
+    marginBottom: height * 0.02,
     textAlign: "center",
   },
   loader: {
-    marginTop: 8
+    marginTop: 8,
   },
 });
