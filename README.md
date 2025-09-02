@@ -1,4 +1,4 @@
-# ChebebTN Expo app
+# ChebebTN-Frontend Part
 
 This is the frontend part of **ChebebTN** built with React Native + [Expo](https://expo.dev) created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
