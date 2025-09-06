@@ -7,7 +7,7 @@ This is the frontend part of **ChebebTN** built with **React Native** + [Expo](h
 - **React Native**: React framework for building the mobile app. 
 - **Axios**: Fetch or send data to APIs.
 - **AsyncStorage**: Equivalent to LocalStorage in the mobile.
-- **expo**: A platform that makes building and testing React Native apps easier.
+- **Expo**: A platform that makes building and testing React Native apps easier.
 
 ## Get started
 
